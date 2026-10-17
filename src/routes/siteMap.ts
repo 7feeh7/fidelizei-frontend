@@ -13,5 +13,6 @@ export default {
     appointments: "/atendimentos",
     newAppointment: "/atendimentos/novo",
     referrals: "/indicacoes",
+    loyaltyRules: "/regras-de-fidelidade",
   },
 };
