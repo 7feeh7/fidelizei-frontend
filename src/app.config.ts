@@ -38,7 +38,7 @@ export interface AppConfig {
 }
 
 const appConfig: AppConfig = {
-  name: "Meu Produto",
+  name: "Fidelizei",
   logo: {
     full: "/logo.svg",
     compact: "/logo-min.svg",

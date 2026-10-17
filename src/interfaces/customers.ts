@@ -4,6 +4,8 @@ export interface CustomerListItem {
   id: string;
   name: string;
   phone: string;
+  dateOfBirth: string | null;
+  leadSource: LeadSource;
 }
 
 export interface ListCustomersParams {
@@ -27,4 +29,6 @@ export interface CreateCustomerPayload {
 export interface CustomerServices {
   list(params: ListCustomersParams): Promise<ListCustomersResponse>;
   create(payload: CreateCustomerPayload): Promise<void>;
+  update(id: string, payload: CreateCustomerPayload): Promise<void>;
+  deactivate(id: string): Promise<void>;
 }

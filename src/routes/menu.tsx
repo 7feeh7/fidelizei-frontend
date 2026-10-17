@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import HomeIcon from "@mui/icons-material/Home";
-import AssignmentIcon from "@mui/icons-material/Assignment";
 import PeopleIcon from "@mui/icons-material/People";
 import siteMap from "./siteMap";
 
@@ -13,11 +12,6 @@ export interface MenuItemConfig {
 /** Itens do menu principal (os mesmos para o menu vertical e o horizontal). */
 const menuItems: MenuItemConfig[] = [
   { label: "Início", path: siteMap.protected.home, icon: <HomeIcon /> },
-  {
-    label: "Exemplo",
-    path: siteMap.protected.example,
-    icon: <AssignmentIcon />,
-  },
   {
     label: "Clientes",
     path: siteMap.protected.customers,

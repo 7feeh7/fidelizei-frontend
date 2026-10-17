@@ -18,6 +18,10 @@ const apiCustomerServices: CustomerServices = {
       .then((res) => res.data),
   create: (payload: CreateCustomerPayload) =>
     api.post("customers", payload).then(() => undefined),
+  update: (id: string, payload: CreateCustomerPayload) =>
+    api.patch(`customers/${id}`, payload).then(() => undefined),
+  deactivate: (id: string) =>
+    api.delete(`customers/${id}`).then(() => undefined),
 };
 
 export const customerServices = MOCK_API

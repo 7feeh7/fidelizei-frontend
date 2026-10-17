@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, DialogContent, Stack } from "@mui/material";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Resolver, useForm } from "react-hook-form";
@@ -7,7 +7,7 @@ import SimpleDialog from "components/Dialogs/SimpleDialog";
 import FastDialogTitle from "components/Dialogs/FastDialogTitle";
 import AutoCompleteField from "components/Forms/AutoCompleteField";
 import TextField from "components/Forms/TextField";
-import { CreateCustomerPayload } from "interfaces/customers";
+import { CreateCustomerPayload, CustomerListItem } from "interfaces/customers";
 import {
   LEAD_SOURCE_OPTIONS,
   LeadSource,
@@ -25,13 +25,24 @@ interface CreateCustomerDialogProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (payload: CreateCustomerPayload) => Promise<void>;
+  customer?: CustomerListItem | null;
+}
+
+function formatDateOfBirth(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  return value.slice(0, 10);
 }
 
 function CreateCustomerDialog({
   open,
   onClose,
   onSubmit,
+  customer = null,
 }: CreateCustomerDialogProps) {
+  const isEditing = Boolean(customer);
   const [isSaving, setIsSaving] = useState(false);
   const {
     control,
@@ -49,6 +60,29 @@ function CreateCustomerDialog({
       dateOfBirth: null,
     },
   });
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    if (customer) {
+      reset({
+        name: customer.name,
+        phone: customer.phone,
+        leadSource: customer.leadSource,
+        dateOfBirth: formatDateOfBirth(customer.dateOfBirth),
+      });
+      return;
+    }
+
+    reset({
+      name: "",
+      phone: "",
+      leadSource: undefined,
+      dateOfBirth: null,
+    });
+  }, [open, customer, reset]);
 
   function handleClose() {
     reset();
@@ -81,7 +115,10 @@ function CreateCustomerDialog({
         }
       }}
     >
-      <FastDialogTitle label="Novo cliente" closeButton={handleClose} />
+      <FastDialogTitle
+        label={isEditing ? "Editar cliente" : "Novo cliente"}
+        closeButton={handleClose}
+      />
       <form onSubmit={handleSubmit(submit)}>
         <DialogContent>
           <Stack spacing={2.5}>
@@ -121,13 +158,15 @@ function CreateCustomerDialog({
             </Stack>
           </Stack>
         </DialogContent>
-        <ActionButton
-          rejectMsg="Cancelar"
-          resolveMsg="Salvar"
-          resolveType="submit"
-          resolveLoading={isSaving}
-          onReject={handleClose}
-        />
+        <Box sx={{ px: 3, pb: 3 }}>
+          <ActionButton
+            rejectMsg="Cancelar"
+            resolveMsg="Salvar"
+            resolveType="submit"
+            resolveLoading={isSaving}
+            onReject={handleClose}
+          />
+        </Box>
       </form>
     </SimpleDialog>
   );

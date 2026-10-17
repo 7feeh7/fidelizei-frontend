@@ -8,6 +8,7 @@ import {
 } from "react-query";
 import { RoundedButton } from "components/Button/RoundedButton";
 import CreateCustomerDialog from "components/Customers/CreateCustomerDialog";
+import CustomerRowActions from "components/Customers/CustomerRowActions";
 import DebouncedSearchField from "components/DebouncedSearchField";
 import { DefaultRenderContainer } from "components/RenderList";
 import {
@@ -19,7 +20,10 @@ import {
   TableRow,
 } from "components/Tables";
 import { useSnackbarContext } from "contexts/SnackbarContext";
-import { CreateCustomerPayload } from "interfaces/customers";
+import {
+  CreateCustomerPayload,
+  CustomerListItem,
+} from "interfaces/customers";
 import { customerServices } from "services/customers";
 import { getApiErrorMessage } from "utils/apiError";
 import { getNextPageParam } from "utils/query";
@@ -27,6 +31,9 @@ import { getNextPageParam } from "utils/query";
 function Customers() {
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<CustomerListItem | null>(
+    null
+  );
   const queryClient = useQueryClient();
   const { snackSuccess, snackError } = useSnackbarContext();
 
@@ -52,11 +59,39 @@ function Customers() {
     [data]
   );
 
+  async function refreshCustomers() {
+    await queryClient.resetQueries(["customers"]);
+  }
+
   const createMutation = useMutation(customerServices.create, {
     onSuccess: async () => {
-      await queryClient.resetQueries(["customers"]);
+      await refreshCustomers();
       snackSuccess("Cliente cadastrado.");
       setCreateOpen(false);
+    },
+  });
+
+  const updateMutation = useMutation(
+    ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: CreateCustomerPayload;
+    }) => customerServices.update(id, payload),
+    {
+      onSuccess: async () => {
+        await refreshCustomers();
+        snackSuccess("Dados atualizados com sucesso");
+        setEditingCustomer(null);
+      },
+    }
+  );
+
+  const deactivateMutation = useMutation(customerServices.deactivate, {
+    onSuccess: async () => {
+      await refreshCustomers();
+      snackSuccess("Cliente excluído.");
     },
   });
 
@@ -69,6 +104,36 @@ function Customers() {
         error
       );
       throw error;
+    }
+  }
+
+  async function handleUpdate(payload: CreateCustomerPayload) {
+    if (!editingCustomer) {
+      return;
+    }
+
+    try {
+      await updateMutation.mutateAsync({
+        id: editingCustomer.id,
+        payload,
+      });
+    } catch (error) {
+      snackError(
+        getApiErrorMessage(error, "Não foi possível atualizar o cliente."),
+        error
+      );
+      throw error;
+    }
+  }
+
+  async function handleDelete(customer: CustomerListItem) {
+    try {
+      await deactivateMutation.mutateAsync(customer.id);
+    } catch (error) {
+      snackError(
+        getApiErrorMessage(error, "Não foi possível excluir o cliente."),
+        error
+      );
     }
   }
 
@@ -136,6 +201,7 @@ function Customers() {
               <TableRow>
                 <TableCell>Nome</TableCell>
                 <TableCell>Telefone</TableCell>
+                <TableCell align="right">Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -143,6 +209,13 @@ function Customers() {
                 <TableRow key={customer.id} hover>
                   <TableCell>{customer.name}</TableCell>
                   <TableCell>{customer.phone}</TableCell>
+                  <TableCell align="right">
+                    <CustomerRowActions
+                      customer={customer}
+                      onEdit={setEditingCustomer}
+                      onDelete={handleDelete}
+                    />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -154,6 +227,13 @@ function Customers() {
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         onSubmit={handleCreate}
+      />
+
+      <CreateCustomerDialog
+        open={Boolean(editingCustomer)}
+        customer={editingCustomer}
+        onClose={() => setEditingCustomer(null)}
+        onSubmit={handleUpdate}
       />
     </Stack>
   );
