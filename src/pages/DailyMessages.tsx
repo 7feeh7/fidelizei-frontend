@@ -30,6 +30,7 @@ import {
   formatMessageTemplateType,
   MESSAGE_TEMPLATE_TYPE_OPTIONS,
 } from "utils/messageTemplatePresentation";
+import { computeAge, formatDateOfBirthDisplay } from "utils/birthday";
 
 type ViewTab = "pending" | "sent" | "canceled";
 
@@ -224,6 +225,18 @@ function DailyMessages() {
                                 `${message.returnReminderAppointmentDate}T12:00:00`
                               ).toLocaleDateString("pt-BR")}
                               )
+                            </>
+                          )}
+                        {message.type === "BIRTHDAY" &&
+                          message.customerDateOfBirth && (
+                            <>
+                              {" "}
+                              · Aniversário{" "}
+                              {formatDateOfBirthDisplay(
+                                message.customerDateOfBirth
+                              )}{" "}
+                              (
+                              {computeAge(message.customerDateOfBirth)} anos)
                             </>
                           )}
                       </Typography>

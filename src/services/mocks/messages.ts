@@ -24,6 +24,7 @@ const mockMessages: MessageListItem[] = [
     sentByName: null,
     returnReminderServiceName: "Corte",
     returnReminderAppointmentDate: "2026-09-17",
+    customerDateOfBirth: null,
     whatsappUrl: buildWhatsAppLinkFromPhone(
       "(85) 99999-1111",
       "Oi Maria! Já faz 30 dias do seu corte. Que tal agendar um retorno?"
@@ -47,6 +48,7 @@ const mockMessages: MessageListItem[] = [
     sentByName: "Admin",
     returnReminderServiceName: null,
     returnReminderAppointmentDate: null,
+    customerDateOfBirth: null,
     whatsappUrl: null,
     createdAt: new Date().toISOString(),
   },
@@ -101,6 +103,7 @@ export const mockMessageServices: MessageServices = {
       sentByName: null,
       returnReminderServiceName: null,
       returnReminderAppointmentDate: null,
+      customerDateOfBirth: null,
       whatsappUrl: buildWhatsAppLinkFromPhone("(85) 99999-0000", content),
       createdAt: new Date().toISOString(),
     };

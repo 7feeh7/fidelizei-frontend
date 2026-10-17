@@ -16,5 +16,6 @@ export default {
     loyaltyRules: "/regras-de-fidelidade",
     messageTemplates: "/modelos-de-mensagem",
     dailyMessages: "/mensagens-do-dia",
+    monthlyBirthdays: "/aniversariantes",
   },
 };

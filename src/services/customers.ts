@@ -5,6 +5,8 @@ import {
   CustomerReturnSummaryResponse,
   CustomerServices,
   ListCustomersResponse,
+  ListMonthlyBirthdaysParams,
+  ListMonthlyBirthdaysResponse,
 } from "interfaces/customers";
 import { api } from "./api";
 import { mockCustomerServices } from "./mocks/customers";
@@ -31,6 +33,10 @@ const apiCustomerServices: CustomerServices = {
       .get<CustomerReturnSummaryResponse>(
         `customers/${customerId}/return-summary`
       )
+      .then((res) => res.data),
+  listMonthlyBirthdays: (params: ListMonthlyBirthdaysParams = {}) =>
+    api
+      .get<ListMonthlyBirthdaysResponse>("customers/birthdays", { params })
       .then((res) => res.data),
 };
 

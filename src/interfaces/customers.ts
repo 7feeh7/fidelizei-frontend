@@ -36,10 +36,32 @@ export interface CustomerReturnSummaryResponse {
   nextSuggestedReturnDate: string | null;
 }
 
+export interface MonthlyBirthdayItem {
+  id: string;
+  name: string;
+  phone: string;
+  dateOfBirth: string;
+  age: number;
+}
+
+export interface ListMonthlyBirthdaysParams {
+  year?: number;
+  month?: number;
+}
+
+export interface ListMonthlyBirthdaysResponse {
+  year: number;
+  month: number;
+  data: MonthlyBirthdayItem[];
+}
+
 export interface CustomerServices {
   list(params: ListCustomersParams): Promise<ListCustomersResponse>;
   create(payload: CreateCustomerPayload): Promise<CreateCustomerResponse>;
   update(id: string, payload: CreateCustomerPayload): Promise<void>;
   deactivate(id: string): Promise<void>;
   getReturnSummary(customerId: string): Promise<CustomerReturnSummaryResponse>;
+  listMonthlyBirthdays(
+    params?: ListMonthlyBirthdaysParams
+  ): Promise<ListMonthlyBirthdaysResponse>;
 }

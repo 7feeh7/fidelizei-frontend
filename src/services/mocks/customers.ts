@@ -3,7 +3,9 @@ import {
   CustomerListItem,
   CustomerServices,
   ListCustomersParams,
+  ListMonthlyBirthdaysParams,
 } from "interfaces/customers";
+import { computeAge } from "utils/birthday";
 import { delay } from "./delay";
 
 const PAGE_SIZE = 10;
@@ -33,7 +35,7 @@ let customers: CustomerListItem[] = [
     id: "1",
     name: "Ana Lima",
     phone: "11999990001",
-    dateOfBirth: null,
+    dateOfBirth: "1992-10-17",
     leadSource: "INSTAGRAM",
     referralsMadeCount: 1,
   }),
@@ -209,5 +211,35 @@ export const mockCustomerServices: CustomerServices = {
   async getReturnSummary(_customerId: string) {
     await delay(200);
     return { nextSuggestedReturnDate: "2026-11-01" };
+  },
+  async listMonthlyBirthdays(params: ListMonthlyBirthdaysParams = {}) {
+    await delay(300);
+    const now = new Date();
+    const year = params.year ?? now.getFullYear();
+    const month = params.month ?? now.getMonth() + 1;
+    const referenceDate = now.toISOString().slice(0, 10);
+
+    const data = customers
+      .filter((customer) => {
+        if (!customer.dateOfBirth) {
+          return false;
+        }
+
+        return Number(customer.dateOfBirth.slice(5, 7)) === month;
+      })
+      .map((customer) => ({
+        id: customer.id,
+        name: customer.name,
+        phone: customer.phone,
+        dateOfBirth: customer.dateOfBirth as string,
+        age: computeAge(customer.dateOfBirth as string, referenceDate),
+      }))
+      .sort(
+        (a, b) =>
+          Number(a.dateOfBirth.slice(8, 10)) -
+          Number(b.dateOfBirth.slice(8, 10))
+      );
+
+    return { year, month, data };
   },
 };

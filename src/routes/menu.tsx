@@ -7,6 +7,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import LoyaltyIcon from "@mui/icons-material/Loyalty";
 import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import MarkChatUnreadIcon from "@mui/icons-material/MarkChatUnread";
+import CakeOutlinedIcon from "@mui/icons-material/CakeOutlined";
 import siteMap from "./siteMap";
 
 export interface MenuItemConfig {
@@ -49,6 +50,11 @@ const menuItems: MenuItemConfig[] = [
     path: siteMap.protected.dailyMessages,
     icon: <MarkChatUnreadIcon />,
     showPendingMessagesBadge: true,
+  },
+  {
+    label: "Aniversariantes",
+    path: siteMap.protected.monthlyBirthdays,
+    icon: <CakeOutlinedIcon />,
   },
   {
     label: "Modelos de mensagem",

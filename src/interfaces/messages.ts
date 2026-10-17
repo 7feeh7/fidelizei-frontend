@@ -21,6 +21,7 @@ export interface MessageListItem {
   sentByName: string | null;
   returnReminderServiceName: string | null;
   returnReminderAppointmentDate: string | null;
+  customerDateOfBirth: string | null;
   whatsappUrl: string | null;
   createdAt: string;
 }

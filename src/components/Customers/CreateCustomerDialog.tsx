@@ -25,6 +25,7 @@ import {
   LeadSource,
   createCustomerValidator,
 } from "validators/customers";
+import { computeAge, formatDateOfBirthDisplay } from "utils/birthday";
 
 type CreateCustomerFormValues = {
   name: string;
@@ -88,6 +89,19 @@ function CreateCustomerDialog({
   });
 
   const leadSource = useWatch({ control, name: "leadSource" });
+  const dateOfBirth = useWatch({ control, name: "dateOfBirth" });
+  const birthdaySummary = useMemo(() => {
+    const value = dateOfBirth || customer?.dateOfBirth;
+
+    if (!value) {
+      return null;
+    }
+
+    const formatted = formatDateOfBirthDisplay(value);
+    const age = computeAge(value.slice(0, 10));
+
+    return formatted ? `${formatted} · ${age} anos` : null;
+  }, [customer?.dateOfBirth, dateOfBirth]);
 
   const { data: customersData, isLoading: isLoadingCustomers } = useQuery(
     ["customers-options"],
@@ -218,6 +232,11 @@ function CreateCustomerDialog({
                 sx={{ flex: 1 }}
               />
             </Stack>
+            {birthdaySummary && (
+              <Typography variant="body2" color="text.secondary">
+                Aniversário: {birthdaySummary}
+              </Typography>
+            )}
             {leadSource === "INDICACAO" && (
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <AutoCompleteField

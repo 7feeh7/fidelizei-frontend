@@ -15,6 +15,7 @@ import Referrals from "pages/Referrals";
 import LoyaltyRules from "pages/LoyaltyRules";
 import MessageTemplates from "pages/MessageTemplates";
 import DailyMessages from "pages/DailyMessages";
+import MonthlyBirthdays from "pages/MonthlyBirthdays";
 
 export default function Router() {
   return (
@@ -57,6 +58,10 @@ export default function Router() {
           <Route
             path={siteMap.protected.dailyMessages}
             element={<DailyMessages />}
+          />
+          <Route
+            path={siteMap.protected.monthlyBirthdays}
+            element={<MonthlyBirthdays />}
           />
         </Route>
         <Route
