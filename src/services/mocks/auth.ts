@@ -3,17 +3,12 @@ import { delay } from "./delay";
 
 /** Aceita qualquer email/senha que passe na validação do formulário. */
 export const mockAuthServices: AuthServices = {
-  async signIn({ username }) {
+  async signIn() {
     await delay();
     return {
       access_token: "mock-access-token",
       refresh_token: "mock-refresh-token",
-      user: {
-        id: 1,
-        name: username.split("@")[0],
-        email: username,
-        role: "Administrador",
-      },
+      expires_in: 86_400,
     };
   },
   async requestNewPassword() {

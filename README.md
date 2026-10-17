@@ -47,7 +47,7 @@ Uma tela pode fugir do padrão passando props: `<AuthContainer layout="centered"
 
 ## API e autenticação
 
-- `src/services/api.ts`: instância Axios em `<VITE_APP_API_URL>v1/`. O token é enviado como `Authorization: Bearer`. Resposta `401` desloga o usuário.
+- `src/services/api.ts`: instância Axios em `<VITE_APP_API_URL>` (em dev, `/api/` com proxy para a API). O token é enviado como `Authorization: Bearer`. Resposta `401` desloga o usuário.
 - `src/services/auth.ts`: endpoints de login e senha (ajuste para a API do produto). O login espera `{ access_token, refresh_token?, user }` (`src/interfaces/auth.ts`).
 - `src/services/mocks/`: respostas falsas usadas quando `VITE_APP_MOCK_API=true`.
 - `src/contexts/AuthContext.tsx`: `useAuth()` expõe `user`, `isAuthenticated`, `signIn` e `signOut`.

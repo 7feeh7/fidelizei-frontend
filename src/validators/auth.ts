@@ -23,7 +23,7 @@ const new_password = password
   .matches(/[^A-Za-z0-9]/, "A senha deve conter ao menos um caractere especial");
 
 export const signInValidator = Yup.object({
-  username: email,
+  email,
   password,
 });
 

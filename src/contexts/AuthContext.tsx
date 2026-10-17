@@ -11,6 +11,7 @@ import { useQueryClient } from "react-query";
 import { SignInPayload, User } from "interfaces/auth";
 import { authServices } from "services/auth";
 import { setUnauthorizedHandler } from "services/handlers";
+import { userFromAccessToken } from "utils/jwt";
 import {
   accessTokenStorage,
   refreshTokenStorage,
@@ -29,18 +30,35 @@ const Context = createContext({} as ContextProps);
 export function AuthProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient();
   const [token, setToken] = useState(() => accessTokenStorage.get());
-  const [user, setUser] = useState(() => userStorage.get());
+  const [user, setUser] = useState(() => {
+    const storedUser = userStorage.get();
+    if (storedUser) {
+      return storedUser;
+    }
+
+    const storedToken = accessTokenStorage.get();
+    if (storedToken) {
+      return userFromAccessToken(storedToken);
+    }
+
+    return null;
+  });
 
   const signIn = useCallback(async (payload: SignInPayload) => {
     const response = await authServices.signIn(payload);
+    const authenticatedUser = userFromAccessToken(
+      response.access_token,
+      payload.email
+    );
+
     accessTokenStorage.set(response.access_token);
     if (response.refresh_token) {
       refreshTokenStorage.set(response.refresh_token);
     }
-    userStorage.set(response.user);
-    setUser(response.user);
+    userStorage.set(authenticatedUser);
+    setUser(authenticatedUser);
     setToken(response.access_token);
-    return response.user;
+    return authenticatedUser;
   }, []);
 
   const signOut = useCallback(() => {

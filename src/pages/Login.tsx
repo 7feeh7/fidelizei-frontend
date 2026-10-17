@@ -21,7 +21,7 @@ function Login() {
   } = useForm<SignInPayload>({
     resolver: yupResolver(signInValidator),
     mode: "onBlur",
-    defaultValues: { username: "", password: "" },
+    defaultValues: { email: "", password: "" },
   });
   const { signIn } = useAuth();
   const { snackError } = useSnackbarContext();
@@ -51,10 +51,10 @@ function Login() {
         <Stack spacing={2}>
           <TextField
             control={control}
-            name="username"
+            name="email"
             label="Email"
             type="email"
-            autoComplete="username"
+            autoComplete="email"
             autoFocus
           />
           <PasswordField

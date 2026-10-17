@@ -7,14 +7,14 @@ export interface User {
 }
 
 export interface SignInPayload {
-  username: string;
+  email: string;
   password: string;
 }
 
 export interface SignInResponse {
   access_token: string;
   refresh_token?: string;
-  user: User;
+  expires_in: number;
 }
 
 export interface ResetPasswordPayload {
