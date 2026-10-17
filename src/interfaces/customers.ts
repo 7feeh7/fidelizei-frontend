@@ -32,9 +32,14 @@ export interface CreateCustomerPayload {
   isExistingCustomer?: boolean;
 }
 
+export interface CustomerReturnSummaryResponse {
+  nextSuggestedReturnDate: string | null;
+}
+
 export interface CustomerServices {
   list(params: ListCustomersParams): Promise<ListCustomersResponse>;
   create(payload: CreateCustomerPayload): Promise<CreateCustomerResponse>;
   update(id: string, payload: CreateCustomerPayload): Promise<void>;
   deactivate(id: string): Promise<void>;
+  getReturnSummary(customerId: string): Promise<CustomerReturnSummaryResponse>;
 }

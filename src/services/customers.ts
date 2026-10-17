@@ -2,6 +2,7 @@ import { MOCK_API } from "config";
 import { CreateCustomerResponse } from "interfaces/customerRewards";
 import {
   CreateCustomerPayload,
+  CustomerReturnSummaryResponse,
   CustomerServices,
   ListCustomersResponse,
 } from "interfaces/customers";
@@ -25,6 +26,12 @@ const apiCustomerServices: CustomerServices = {
     api.patch(`customers/${id}`, payload).then(() => undefined),
   deactivate: (id: string) =>
     api.delete(`customers/${id}`).then(() => undefined),
+  getReturnSummary: (customerId: string) =>
+    api
+      .get<CustomerReturnSummaryResponse>(
+        `customers/${customerId}/return-summary`
+      )
+      .then((res) => res.data),
 };
 
 export const customerServices = MOCK_API

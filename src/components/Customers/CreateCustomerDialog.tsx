@@ -61,6 +61,12 @@ function CreateCustomerDialog({
   const isEditing = Boolean(customer);
   const hasExistingReferrer = Boolean(customer?.referrerId);
   const [isSaving, setIsSaving] = useState(false);
+
+  const { data: returnSummary } = useQuery(
+    ["customer-return-summary", customer?.id],
+    () => customerServices.getReturnSummary(customer!.id),
+    { enabled: Boolean(customer?.id) }
+  );
   const {
     control,
     handleSubmit,
@@ -249,6 +255,14 @@ function CreateCustomerDialog({
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Indicações feitas: {customer?.referralsMadeCount ?? 0}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Próximo retorno sugerido:{" "}
+                  {returnSummary?.nextSuggestedReturnDate
+                    ? new Date(
+                        `${returnSummary.nextSuggestedReturnDate}T12:00:00`
+                      ).toLocaleDateString("pt-BR")
+                    : "—"}
                 </Typography>
               </Stack>
             )}

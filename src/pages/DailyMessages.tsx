@@ -214,6 +214,18 @@ function DailyMessages() {
                       <Typography variant="body2" color="text.secondary">
                         {message.customerPhone} ·{" "}
                         {formatMessageTemplateType(message.type)}
+                        {message.type === "RETURN_REMINDER" &&
+                          message.returnReminderServiceName &&
+                          message.returnReminderAppointmentDate && (
+                            <>
+                              {" "}
+                              · {message.returnReminderServiceName} (
+                              {new Date(
+                                `${message.returnReminderAppointmentDate}T12:00:00`
+                              ).toLocaleDateString("pt-BR")}
+                              )
+                            </>
+                          )}
                       </Typography>
                     </Box>
                     {tab !== "pending" && (

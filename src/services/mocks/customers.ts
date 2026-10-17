@@ -206,4 +206,8 @@ export const mockCustomerServices: CustomerServices = {
 
     customers = customers.filter((customer) => customer.id !== id);
   },
+  async getReturnSummary(_customerId: string) {
+    await delay(200);
+    return { nextSuggestedReturnDate: "2026-11-01" };
+  },
 };
