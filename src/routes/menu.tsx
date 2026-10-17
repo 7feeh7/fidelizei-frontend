@@ -3,6 +3,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import ShareIcon from "@mui/icons-material/Share";
 import siteMap from "./siteMap";
 
 export interface MenuItemConfig {
@@ -28,6 +29,11 @@ const menuItems: MenuItemConfig[] = [
     label: "Atendimentos",
     path: siteMap.protected.appointments,
     icon: <EventAvailableIcon />,
+  },
+  {
+    label: "Indicações",
+    path: siteMap.protected.referrals,
+    icon: <ShareIcon />,
   },
 ];
 

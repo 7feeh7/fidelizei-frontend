@@ -26,4 +26,19 @@ export const createCustomerValidator = Yup.object({
     .oneOf([...LEAD_SOURCES], "Selecione como conheceu o salão")
     .required("Selecione como conheceu o salão"),
   dateOfBirth: Yup.string().nullable().optional(),
+  referrerId: Yup.string().when("leadSource", {
+    is: "INDICACAO",
+    then: (schema) =>
+      schema.test(
+        "referrer-required",
+        "Informe quem indicou o cliente",
+        function validateReferrer(value) {
+          if (this.options.context?.hasExistingReferrer) {
+            return true;
+          }
+          return Boolean(value?.trim());
+        }
+      ),
+    otherwise: (schema) => schema.nullable().optional(),
+  }),
 });

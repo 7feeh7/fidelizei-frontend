@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-import { Box, DialogContent, Stack } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
+import { Box, DialogContent, Stack, Typography } from "@mui/material";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Resolver, useForm } from "react-hook-form";
+import { Resolver, useForm, useWatch } from "react-hook-form";
+import { useQuery } from "react-query";
 import ActionButton from "components/ActionButton";
 import SimpleDialog from "components/Dialogs/SimpleDialog";
 import FastDialogTitle from "components/Dialogs/FastDialogTitle";
 import AutoCompleteField from "components/Forms/AutoCompleteField";
 import TextField from "components/Forms/TextField";
 import { CreateCustomerPayload, CustomerListItem } from "interfaces/customers";
+import { customerServices } from "services/customers";
 import {
   LEAD_SOURCE_OPTIONS,
   LeadSource,
@@ -19,6 +21,7 @@ type CreateCustomerFormValues = {
   phone: string;
   leadSource?: LeadSource;
   dateOfBirth?: string | null;
+  referrerId?: string | null;
 };
 
 interface CreateCustomerDialogProps {
@@ -43,6 +46,7 @@ function CreateCustomerDialog({
   customer = null,
 }: CreateCustomerDialogProps) {
   const isEditing = Boolean(customer);
+  const hasExistingReferrer = Boolean(customer?.referrerId);
   const [isSaving, setIsSaving] = useState(false);
   const {
     control,
@@ -52,14 +56,35 @@ function CreateCustomerDialog({
     resolver: yupResolver(
       createCustomerValidator
     ) as Resolver<CreateCustomerFormValues>,
+    context: { hasExistingReferrer },
     mode: "onBlur",
     defaultValues: {
       name: "",
       phone: "",
       leadSource: undefined,
       dateOfBirth: null,
+      referrerId: null,
     },
   });
+
+  const leadSource = useWatch({ control, name: "leadSource" });
+
+  const { data: customersData, isLoading: isLoadingCustomers } = useQuery(
+    ["customers-options"],
+    () => customerServices.list({ page: 1 }),
+    { enabled: open }
+  );
+
+  const referrerOptions = useMemo(
+    () =>
+      (customersData?.data ?? [])
+        .filter((entry) => entry.id !== customer?.id)
+        .map((entry) => ({
+          label: entry.name,
+          value: entry.id,
+        })),
+    [customersData, customer?.id]
+  );
 
   useEffect(() => {
     if (!open) {
@@ -72,6 +97,7 @@ function CreateCustomerDialog({
         phone: customer.phone,
         leadSource: customer.leadSource,
         dateOfBirth: formatDateOfBirth(customer.dateOfBirth),
+        referrerId: customer.referrerId,
       });
       return;
     }
@@ -81,6 +107,7 @@ function CreateCustomerDialog({
       phone: "",
       leadSource: undefined,
       dateOfBirth: null,
+      referrerId: null,
     });
   }, [open, customer, reset]);
 
@@ -92,12 +119,22 @@ function CreateCustomerDialog({
   async function submit(data: CreateCustomerFormValues) {
     setIsSaving(true);
     try {
-      await onSubmit({
+      const payload: CreateCustomerPayload = {
         name: data.name,
         phone: data.phone.replace(/\D/g, ""),
         leadSource: data.leadSource as LeadSource,
         dateOfBirth: data.dateOfBirth || null,
-      });
+      };
+
+      if (
+        data.leadSource === "INDICACAO" &&
+        data.referrerId &&
+        !hasExistingReferrer
+      ) {
+        payload.referrerId = data.referrerId;
+      }
+
+      await onSubmit(payload);
       reset();
     } finally {
       setIsSaving(false);
@@ -156,6 +193,29 @@ function CreateCustomerDialog({
                 sx={{ flex: 1 }}
               />
             </Stack>
+            {leadSource === "INDICACAO" && (
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <AutoCompleteField
+                  control={control}
+                  name="referrerId"
+                  label="Indicado por"
+                  placeholder="Busque o cliente que indicou"
+                  options={referrerOptions}
+                  loading={isLoadingCustomers}
+                  disabled={hasExistingReferrer}
+                />
+              </Box>
+            )}
+            {isEditing && (
+              <Stack spacing={0.5}>
+                <Typography variant="body2" color="text.secondary">
+                  Indicado por: {customer?.referrerName ?? "—"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Indicações feitas: {customer?.referralsMadeCount ?? 0}
+                </Typography>
+              </Stack>
+            )}
           </Stack>
         </DialogContent>
         <Box sx={{ px: 3, pb: 3 }}>

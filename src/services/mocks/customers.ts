@@ -8,91 +8,114 @@ import { delay } from "./delay";
 
 const PAGE_SIZE = 10;
 
+function createCustomerItem(
+  item: Omit<
+    CustomerListItem,
+    "referrerId" | "referrerName" | "referralsMadeCount"
+  > &
+    Partial<
+      Pick<
+        CustomerListItem,
+        "referrerId" | "referrerName" | "referralsMadeCount"
+      >
+    >
+): CustomerListItem {
+  return {
+    referrerId: null,
+    referrerName: null,
+    referralsMadeCount: 0,
+    ...item,
+  };
+}
+
 let customers: CustomerListItem[] = [
-  {
+  createCustomerItem({
     id: "1",
     name: "Ana Lima",
     phone: "11999990001",
     dateOfBirth: null,
     leadSource: "INSTAGRAM",
-  },
-  {
+    referralsMadeCount: 1,
+  }),
+  createCustomerItem({
     id: "2",
     name: "Bruno Souza",
     phone: "11999990002",
     dateOfBirth: null,
     leadSource: "INDICACAO",
-  },
-  {
+    referrerId: "1",
+    referrerName: "Ana Lima",
+  }),
+  createCustomerItem({
     id: "3",
     name: "Carla Mendes",
     phone: "21988880003",
     dateOfBirth: null,
     leadSource: "PANFLETO",
-  },
-  {
+  }),
+  createCustomerItem({
     id: "4",
     name: "Diego Alves",
     phone: "31977770004",
     dateOfBirth: null,
     leadSource: "OUTRO",
-  },
-  {
+  }),
+  createCustomerItem({
     id: "5",
     name: "Elisa Rocha",
     phone: "41966660005",
     dateOfBirth: null,
     leadSource: "INSTAGRAM",
-  },
-  {
+  }),
+  createCustomerItem({
     id: "6",
     name: "Felipe Costa",
     phone: "51955550006",
     dateOfBirth: null,
     leadSource: "INDICACAO",
-  },
-  {
+  }),
+  createCustomerItem({
     id: "7",
     name: "Gabriela Nunes",
     phone: "61944440007",
     dateOfBirth: null,
     leadSource: "PANFLETO",
-  },
-  {
+  }),
+  createCustomerItem({
     id: "8",
     name: "Henrique Dias",
     phone: "71933330008",
     dateOfBirth: null,
     leadSource: "OUTRO",
-  },
-  {
+  }),
+  createCustomerItem({
     id: "9",
     name: "Isabela Pires",
     phone: "81922220009",
     dateOfBirth: null,
     leadSource: "INSTAGRAM",
-  },
-  {
+  }),
+  createCustomerItem({
     id: "10",
     name: "João Pedro",
     phone: "91911110010",
     dateOfBirth: null,
     leadSource: "INDICACAO",
-  },
-  {
+  }),
+  createCustomerItem({
     id: "11",
     name: "Karina Veiga",
     phone: "11900000011",
     dateOfBirth: null,
     leadSource: "PANFLETO",
-  },
-  {
+  }),
+  createCustomerItem({
     id: "12",
     name: "Lucas Ferreira",
     phone: "11900000012",
     dateOfBirth: null,
     leadSource: "OUTRO",
-  },
+  }),
 ];
 
 function filterCustomers(search?: string) {
@@ -128,13 +151,15 @@ export const mockCustomerServices: CustomerServices = {
     }
 
     customers = [
-      {
+      createCustomerItem({
         id: crypto.randomUUID(),
         name: payload.name.trim(),
         phone,
         dateOfBirth: payload.dateOfBirth ?? null,
         leadSource: payload.leadSource,
-      },
+        referrerId: payload.referrerId ?? null,
+        referrerName: payload.referrerId ? "Cliente indicador" : null,
+      }),
       ...customers,
     ];
   },
@@ -162,6 +187,10 @@ export const mockCustomerServices: CustomerServices = {
             phone,
             dateOfBirth: payload.dateOfBirth ?? null,
             leadSource: payload.leadSource,
+            referrerId: customer.referrerId ?? payload.referrerId ?? null,
+            referrerName:
+              customer.referrerName ??
+              (payload.referrerId ? "Cliente indicador" : null),
           }
         : customer
     );

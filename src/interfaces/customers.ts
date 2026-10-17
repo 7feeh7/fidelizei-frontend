@@ -6,6 +6,9 @@ export interface CustomerListItem {
   phone: string;
   dateOfBirth: string | null;
   leadSource: LeadSource;
+  referrerId: string | null;
+  referrerName: string | null;
+  referralsMadeCount: number;
 }
 
 export interface ListCustomersParams {
@@ -24,6 +27,7 @@ export interface CreateCustomerPayload {
   phone: string;
   leadSource: LeadSource;
   dateOfBirth?: string | null;
+  referrerId?: string;
 }
 
 export interface CustomerServices {

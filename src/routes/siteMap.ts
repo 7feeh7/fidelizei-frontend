@@ -12,5 +12,6 @@ export default {
     services: "/servicos",
     appointments: "/atendimentos",
     newAppointment: "/atendimentos/novo",
+    referrals: "/indicacoes",
   },
 };

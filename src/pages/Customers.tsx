@@ -201,6 +201,8 @@ function Customers() {
               <TableRow>
                 <TableCell>Nome</TableCell>
                 <TableCell>Telefone</TableCell>
+                <TableCell>Indicado por</TableCell>
+                <TableCell align="center">Indicações</TableCell>
                 <TableCell align="right">Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -209,6 +211,10 @@ function Customers() {
                 <TableRow key={customer.id} hover>
                   <TableCell>{customer.name}</TableCell>
                   <TableCell>{customer.phone}</TableCell>
+                  <TableCell>{customer.referrerName ?? "—"}</TableCell>
+                  <TableCell align="center">
+                    {customer.referralsMadeCount}
+                  </TableCell>
                   <TableCell align="right">
                     <CustomerRowActions
                       customer={customer}

@@ -11,6 +11,7 @@ import Customers from "pages/Customers";
 import Services from "pages/Services";
 import Appointments from "pages/Appointments";
 import AppointmentForm from "pages/AppointmentForm";
+import Referrals from "pages/Referrals";
 
 export default function Router() {
   return (
@@ -41,6 +42,7 @@ export default function Router() {
             path={`${siteMap.protected.appointments}/:id`}
             element={<AppointmentForm />}
           />
+          <Route path={siteMap.protected.referrals} element={<Referrals />} />
         </Route>
         <Route
           path="*"
