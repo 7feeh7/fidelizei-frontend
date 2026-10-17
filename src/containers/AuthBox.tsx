@@ -36,7 +36,7 @@ function AuthBox({
         }}
       >
         <div>
-          <Typography color="primary" fontSize={36} fontWeight={700}>
+          <Typography color="text.primary" fontSize={36} fontWeight={700}>
             {title}
           </Typography>
           {subtitle && (

@@ -17,6 +17,7 @@ const theme = createTheme(
       },
       background: {
         default: colors.background,
+        paper: colors.surface,
       },
       text: {
         primary: colors.textPrimary,
@@ -29,6 +30,13 @@ const theme = createTheme(
     //   }
     // },
     components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          a: {
+            color: colors.primary,
+          },
+        },
+      },
       MuiButton: {
         defaultProps: {
           variant: "contained",
