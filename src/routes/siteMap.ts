@@ -8,5 +8,6 @@ export default {
   protected: {
     home: "/",
     example: "/exemplo",
+    customers: "/clientes",
   },
 };

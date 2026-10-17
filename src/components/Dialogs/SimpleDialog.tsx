@@ -3,7 +3,8 @@ import Dialog, { DialogProps } from "@mui/material/Dialog";
 import { mainTransition } from "./transition";
 import { SxProps, Theme } from "@mui/material";
 
-export interface SimpleDialogProps {
+export interface SimpleDialogProps
+  extends Pick<DialogProps, "maxWidth" | "fullWidth"> {
   sx?: SxProps<Theme>;
   style?: React.CSSProperties;
   open: boolean;

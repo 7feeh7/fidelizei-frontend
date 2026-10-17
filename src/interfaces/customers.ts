@@ -1,0 +1,30 @@
+import type { LeadSource } from "validators/customers";
+
+export interface CustomerListItem {
+  id: string;
+  name: string;
+  phone: string;
+}
+
+export interface ListCustomersParams {
+  page?: number;
+  search?: string;
+}
+
+export interface ListCustomersResponse {
+  data: CustomerListItem[];
+  page: number;
+  totalPages: number;
+}
+
+export interface CreateCustomerPayload {
+  name: string;
+  phone: string;
+  leadSource: LeadSource;
+  dateOfBirth?: string | null;
+}
+
+export interface CustomerServices {
+  list(params: ListCustomersParams): Promise<ListCustomersResponse>;
+  create(payload: CreateCustomerPayload): Promise<void>;
+}

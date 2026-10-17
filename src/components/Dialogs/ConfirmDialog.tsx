@@ -15,6 +15,8 @@ function ConfirmDialog({
   open,
   sx,
   style,
+  maxWidth,
+  fullWidth,
   confirmTitle,
   confirmSubtitle,
   danger,
@@ -22,7 +24,14 @@ function ConfirmDialog({
   ...actionProps
 }: ConfirmDialogProps) {
   return (
-    <SimpleDialog open={open} sx={sx} style={style} onClose={onClose}>
+    <SimpleDialog
+      open={open}
+      sx={sx}
+      style={style}
+      maxWidth={maxWidth}
+      fullWidth={fullWidth}
+      onClose={onClose}
+    >
       <FastDialogTitle label="Confirmação" closeButton={onClose} />
       <DialogContent>
         <Typography
