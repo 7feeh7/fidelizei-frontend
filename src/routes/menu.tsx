@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
+import DesignServicesIcon from "@mui/icons-material/DesignServices";
 import siteMap from "./siteMap";
 
 export interface MenuItemConfig {
@@ -16,6 +17,11 @@ const menuItems: MenuItemConfig[] = [
     label: "Clientes",
     path: siteMap.protected.customers,
     icon: <PeopleIcon />,
+  },
+  {
+    label: "Serviços",
+    path: siteMap.protected.services,
+    icon: <DesignServicesIcon />,
   },
 ];
 

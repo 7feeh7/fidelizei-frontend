@@ -8,6 +8,7 @@ import RequestNewPassword from "pages/RequestNewPassword";
 import ResetPassword from "pages/ResetPassword";
 import Home from "pages/Home";
 import Customers from "pages/Customers";
+import Services from "pages/Services";
 
 export default function Router() {
   return (
@@ -25,6 +26,7 @@ export default function Router() {
         <Route element={<ProtectedMiddleware />}>
           <Route path={siteMap.protected.home} element={<Home />} />
           <Route path={siteMap.protected.customers} element={<Customers />} />
+          <Route path={siteMap.protected.services} element={<Services />} />
         </Route>
         <Route
           path="*"

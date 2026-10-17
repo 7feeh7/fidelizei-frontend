@@ -9,5 +9,6 @@ export default {
     home: "/",
     example: "/exemplo",
     customers: "/clientes",
+    services: "/servicos",
   },
 };
