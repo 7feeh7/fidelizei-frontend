@@ -14,5 +14,6 @@ export default {
     newAppointment: "/atendimentos/novo",
     referrals: "/indicacoes",
     loyaltyRules: "/regras-de-fidelidade",
+    messageTemplates: "/modelos-de-mensagem",
   },
 };

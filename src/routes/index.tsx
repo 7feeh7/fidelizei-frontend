@@ -13,6 +13,7 @@ import Appointments from "pages/Appointments";
 import AppointmentForm from "pages/AppointmentForm";
 import Referrals from "pages/Referrals";
 import LoyaltyRules from "pages/LoyaltyRules";
+import MessageTemplates from "pages/MessageTemplates";
 
 export default function Router() {
   return (
@@ -47,6 +48,10 @@ export default function Router() {
           <Route
             path={siteMap.protected.loyaltyRules}
             element={<LoyaltyRules />}
+          />
+          <Route
+            path={siteMap.protected.messageTemplates}
+            element={<MessageTemplates />}
           />
         </Route>
         <Route

@@ -5,6 +5,7 @@ import DesignServicesIcon from "@mui/icons-material/DesignServices";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import ShareIcon from "@mui/icons-material/Share";
 import LoyaltyIcon from "@mui/icons-material/Loyalty";
+import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import siteMap from "./siteMap";
 
 export interface MenuItemConfig {
@@ -40,6 +41,11 @@ const menuItems: MenuItemConfig[] = [
     label: "Fidelidade",
     path: siteMap.protected.loyaltyRules,
     icon: <LoyaltyIcon />,
+  },
+  {
+    label: "Mensagens",
+    path: siteMap.protected.messageTemplates,
+    icon: <ChatOutlinedIcon />,
   },
 ];
 
