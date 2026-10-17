@@ -9,6 +9,7 @@ import {
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import SendIcon from "@mui/icons-material/Send";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useNavigate } from "react-router-dom";
 import { CustomerListItem } from "interfaces/customers";
@@ -18,12 +19,14 @@ interface CustomerRowActionsProps {
   customer: CustomerListItem;
   onEdit: (customer: CustomerListItem) => void;
   onDelete: (customer: CustomerListItem) => void;
+  onSendMessage: (customer: CustomerListItem) => void;
 }
 
 function CustomerRowActions({
   customer,
   onEdit,
   onDelete,
+  onSendMessage,
 }: CustomerRowActionsProps) {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -53,6 +56,17 @@ function CustomerRowActions({
             <EditOutlinedIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Editar</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            onSendMessage(customer);
+          }}
+        >
+          <ListItemIcon>
+            <SendIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Enviar mensagem</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {

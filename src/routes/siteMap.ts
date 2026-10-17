@@ -15,5 +15,6 @@ export default {
     referrals: "/indicacoes",
     loyaltyRules: "/regras-de-fidelidade",
     messageTemplates: "/modelos-de-mensagem",
+    dailyMessages: "/mensagens-do-dia",
   },
 };

@@ -4,11 +4,13 @@ import AddIcon from "@mui/icons-material/Add";
 import {
   useInfiniteQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from "react-query";
 import { RoundedButton } from "components/Button/RoundedButton";
 import CreateCustomerDialog from "components/Customers/CreateCustomerDialog";
 import CustomerRowActions from "components/Customers/CustomerRowActions";
+import SendCustomerMessageDialog from "components/Messages/SendCustomerMessageDialog";
 import DebouncedSearchField from "components/DebouncedSearchField";
 import { DefaultRenderContainer } from "components/RenderList";
 import {
@@ -25,6 +27,8 @@ import {
   CustomerListItem,
 } from "interfaces/customers";
 import { customerServices } from "services/customers";
+import { messageServices } from "services/messages";
+import { messageTemplateServices } from "services/messageTemplates";
 import { getApiErrorMessage } from "utils/apiError";
 import { formatGrantedRewardsMessage } from "utils/grantedRewardsMessage";
 import { getNextPageParam } from "utils/query";
@@ -35,6 +39,8 @@ function Customers() {
   const [editingCustomer, setEditingCustomer] = useState<CustomerListItem | null>(
     null
   );
+  const [messageCustomer, setMessageCustomer] =
+    useState<CustomerListItem | null>(null);
   const queryClient = useQueryClient();
   const { snackSuccess, snackError } = useSnackbarContext();
 
@@ -94,6 +100,28 @@ function Customers() {
     }
   );
 
+  const { data: messageTemplatesData } = useQuery(
+    ["message-templates", "send-message"],
+    () => messageTemplateServices.list(),
+    { enabled: Boolean(messageCustomer) }
+  );
+
+  const createMessageMutation = useMutation(
+    ({
+      customerId,
+      payload,
+    }: {
+      customerId: string;
+      payload: { templateId?: string; content?: string };
+    }) => messageServices.createForCustomer(customerId, payload),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(["messages"]);
+        await queryClient.invalidateQueries(["messages-pending-count"]);
+      },
+    }
+  );
+
   const deactivateMutation = useMutation(customerServices.deactivate, {
     onSuccess: async () => {
       await refreshCustomers();
@@ -126,6 +154,30 @@ function Customers() {
     } catch (error) {
       snackError(
         getApiErrorMessage(error, "Não foi possível atualizar o cliente."),
+        error
+      );
+      throw error;
+    }
+  }
+
+  async function handleCreateMessage(payload: {
+    templateId?: string;
+    content?: string;
+  }) {
+    if (!messageCustomer) {
+      return;
+    }
+
+    try {
+      await createMessageMutation.mutateAsync({
+        customerId: messageCustomer.id,
+        payload,
+      });
+      snackSuccess("Mensagem adicionada à fila.");
+      setMessageCustomer(null);
+    } catch (error) {
+      snackError(
+        getApiErrorMessage(error, "Não foi possível criar a mensagem."),
         error
       );
       throw error;
@@ -226,6 +278,7 @@ function Customers() {
                       customer={customer}
                       onEdit={setEditingCustomer}
                       onDelete={handleDelete}
+                      onSendMessage={setMessageCustomer}
                     />
                   </TableCell>
                 </TableRow>
@@ -246,6 +299,17 @@ function Customers() {
         customer={editingCustomer}
         onClose={() => setEditingCustomer(null)}
         onSubmit={handleUpdate}
+        onSendMessage={
+          editingCustomer ? () => setMessageCustomer(editingCustomer) : undefined
+        }
+      />
+
+      <SendCustomerMessageDialog
+        open={Boolean(messageCustomer)}
+        customer={messageCustomer}
+        templates={messageTemplatesData?.data ?? []}
+        onClose={() => setMessageCustomer(null)}
+        onSubmit={handleCreateMessage}
       />
     </Stack>
   );

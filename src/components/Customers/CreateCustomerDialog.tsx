@@ -11,7 +11,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, Resolver, useForm, useWatch } from "react-hook-form";
 import { useQuery } from "react-query";
 import ActionButton from "components/ActionButton";
+import CustomerMessagesPanel from "components/Customers/CustomerMessagesPanel";
 import CustomerRewardsPanel from "components/Customers/CustomerRewardsPanel";
+import { RoundedButton } from "components/Button/RoundedButton";
 import SimpleDialog from "components/Dialogs/SimpleDialog";
 import FastDialogTitle from "components/Dialogs/FastDialogTitle";
 import AutoCompleteField from "components/Forms/AutoCompleteField";
@@ -38,6 +40,7 @@ interface CreateCustomerDialogProps {
   onClose: () => void;
   onSubmit: (payload: CreateCustomerPayload) => Promise<void>;
   customer?: CustomerListItem | null;
+  onSendMessage?: () => void;
 }
 
 function formatDateOfBirth(value: string | null | undefined) {
@@ -53,6 +56,7 @@ function CreateCustomerDialog({
   onClose,
   onSubmit,
   customer = null,
+  onSendMessage,
 }: CreateCustomerDialogProps) {
   const isEditing = Boolean(customer);
   const hasExistingReferrer = Boolean(customer?.referrerId);
@@ -248,8 +252,16 @@ function CreateCustomerDialog({
                 </Typography>
               </Stack>
             )}
+            {isEditing && customer && onSendMessage && (
+              <RoundedButton onClick={onSendMessage} sx={{ alignSelf: "flex-start" }}>
+                Enviar mensagem
+              </RoundedButton>
+            )}
             {isEditing && customer && (
               <CustomerRewardsPanel customerId={customer.id} />
+            )}
+            {isEditing && customer && (
+              <CustomerMessagesPanel customerId={customer.id} />
             )}
           </Stack>
         </DialogContent>

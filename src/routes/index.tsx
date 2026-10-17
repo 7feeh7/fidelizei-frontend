@@ -14,6 +14,7 @@ import AppointmentForm from "pages/AppointmentForm";
 import Referrals from "pages/Referrals";
 import LoyaltyRules from "pages/LoyaltyRules";
 import MessageTemplates from "pages/MessageTemplates";
+import DailyMessages from "pages/DailyMessages";
 
 export default function Router() {
   return (
@@ -52,6 +53,10 @@ export default function Router() {
           <Route
             path={siteMap.protected.messageTemplates}
             element={<MessageTemplates />}
+          />
+          <Route
+            path={siteMap.protected.dailyMessages}
+            element={<DailyMessages />}
           />
         </Route>
         <Route

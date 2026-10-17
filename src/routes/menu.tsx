@@ -6,12 +6,14 @@ import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import ShareIcon from "@mui/icons-material/Share";
 import LoyaltyIcon from "@mui/icons-material/Loyalty";
 import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
+import MarkChatUnreadIcon from "@mui/icons-material/MarkChatUnread";
 import siteMap from "./siteMap";
 
 export interface MenuItemConfig {
   label: string;
   path: string;
   icon?: ReactNode;
+  showPendingMessagesBadge?: boolean;
 }
 
 /** Itens do menu principal (os mesmos para o menu vertical e o horizontal). */
@@ -43,7 +45,13 @@ const menuItems: MenuItemConfig[] = [
     icon: <LoyaltyIcon />,
   },
   {
-    label: "Mensagens",
+    label: "Mensagens do dia",
+    path: siteMap.protected.dailyMessages,
+    icon: <MarkChatUnreadIcon />,
+    showPendingMessagesBadge: true,
+  },
+  {
+    label: "Modelos de mensagem",
     path: siteMap.protected.messageTemplates,
     icon: <ChatOutlinedIcon />,
   },

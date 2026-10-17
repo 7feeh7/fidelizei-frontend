@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   ListItem,
   ListItemButton,
@@ -12,8 +13,24 @@ import { MenuItemConfig } from "routes/menu";
 interface MenuItemProps extends MenuItemConfig {
   orientation: MenuLayout;
   onClick?: () => void;
+  badgeCount?: number;
 }
-function MenuItem({ label, icon, path, orientation, onClick }: MenuItemProps) {
+function MenuItem({
+  label,
+  icon,
+  path,
+  orientation,
+  onClick,
+  badgeCount,
+}: MenuItemProps) {
+  const iconWithBadge =
+    icon && badgeCount && badgeCount > 0 ? (
+      <Badge color="error" badgeContent={badgeCount} max={99}>
+        {icon}
+      </Badge>
+    ) : (
+      icon
+    );
   const resolved = useResolvedPath(path);
   const active = !!useMatch({ path: resolved.pathname, end: path === "/" });
 
@@ -23,7 +40,7 @@ function MenuItem({ label, icon, path, orientation, onClick }: MenuItemProps) {
         component={NavLink}
         to={path}
         onClick={onClick}
-        startIcon={icon}
+        startIcon={iconWithBadge}
         variant="text"
         color={active ? "primary" : "inherit"}
         sx={{
@@ -48,9 +65,9 @@ function MenuItem({ label, icon, path, orientation, onClick }: MenuItemProps) {
         selected={active}
         sx={{ borderRadius: 2 }}
       >
-        {icon && (
+        {iconWithBadge && (
           <ListItemIcon sx={{ color: active ? "primary.main" : undefined }}>
-            {icon}
+            {iconWithBadge}
           </ListItemIcon>
         )}
         <ListItemText
