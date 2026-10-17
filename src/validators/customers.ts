@@ -26,6 +26,7 @@ export const createCustomerValidator = Yup.object({
     .oneOf([...LEAD_SOURCES], "Selecione como conheceu o salão")
     .required("Selecione como conheceu o salão"),
   dateOfBirth: Yup.string().nullable().optional(),
+  isExistingCustomer: Yup.boolean().optional(),
   referrerId: Yup.string().when("leadSource", {
     is: "INDICACAO",
     then: (schema) =>

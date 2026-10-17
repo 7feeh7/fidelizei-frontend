@@ -162,6 +162,8 @@ export const mockCustomerServices: CustomerServices = {
       }),
       ...customers,
     ];
+
+    return { grantedRewards: [] };
   },
   async update(id: string, payload: CreateCustomerPayload) {
     await delay(400);

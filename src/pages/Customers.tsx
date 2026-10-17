@@ -26,6 +26,7 @@ import {
 } from "interfaces/customers";
 import { customerServices } from "services/customers";
 import { getApiErrorMessage } from "utils/apiError";
+import { formatGrantedRewardsMessage } from "utils/grantedRewardsMessage";
 import { getNextPageParam } from "utils/query";
 
 function Customers() {
@@ -64,9 +65,14 @@ function Customers() {
   }
 
   const createMutation = useMutation(customerServices.create, {
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       await refreshCustomers();
-      snackSuccess("Cliente cadastrado.");
+      const grantMessage = formatGrantedRewardsMessage(data.grantedRewards ?? []);
+      snackSuccess(
+        grantMessage
+          ? `Cliente cadastrado. ${grantMessage}`
+          : "Cliente cadastrado."
+      );
       setCreateOpen(false);
     },
   });

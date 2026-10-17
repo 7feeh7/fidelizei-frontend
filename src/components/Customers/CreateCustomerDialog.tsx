@@ -1,9 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { Box, DialogContent, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  DialogContent,
+  FormControlLabel,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Resolver, useForm, useWatch } from "react-hook-form";
+import { Controller, Resolver, useForm, useWatch } from "react-hook-form";
 import { useQuery } from "react-query";
 import ActionButton from "components/ActionButton";
+import CustomerRewardsPanel from "components/Customers/CustomerRewardsPanel";
 import SimpleDialog from "components/Dialogs/SimpleDialog";
 import FastDialogTitle from "components/Dialogs/FastDialogTitle";
 import AutoCompleteField from "components/Forms/AutoCompleteField";
@@ -22,6 +30,7 @@ type CreateCustomerFormValues = {
   leadSource?: LeadSource;
   dateOfBirth?: string | null;
   referrerId?: string | null;
+  isExistingCustomer?: boolean;
 };
 
 interface CreateCustomerDialogProps {
@@ -64,6 +73,7 @@ function CreateCustomerDialog({
       leadSource: undefined,
       dateOfBirth: null,
       referrerId: null,
+      isExistingCustomer: false,
     },
   });
 
@@ -108,6 +118,7 @@ function CreateCustomerDialog({
       leadSource: undefined,
       dateOfBirth: null,
       referrerId: null,
+      isExistingCustomer: false,
     });
   }, [open, customer, reset]);
 
@@ -132,6 +143,10 @@ function CreateCustomerDialog({
         !hasExistingReferrer
       ) {
         payload.referrerId = data.referrerId;
+      }
+
+      if (!isEditing && data.isExistingCustomer) {
+        payload.isExistingCustomer = true;
       }
 
       await onSubmit(payload);
@@ -206,6 +221,23 @@ function CreateCustomerDialog({
                 />
               </Box>
             )}
+            {!isEditing && (
+              <Controller
+                control={control}
+                name="isExistingCustomer"
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={Boolean(field.value)}
+                        onChange={(_, checked) => field.onChange(checked)}
+                      />
+                    }
+                    label="Já é cliente (cadastro retroativo — não concede benefício de primeira visita)"
+                  />
+                )}
+              />
+            )}
             {isEditing && (
               <Stack spacing={0.5}>
                 <Typography variant="body2" color="text.secondary">
@@ -215,6 +247,9 @@ function CreateCustomerDialog({
                   Indicações feitas: {customer?.referralsMadeCount ?? 0}
                 </Typography>
               </Stack>
+            )}
+            {isEditing && customer && (
+              <CustomerRewardsPanel customerId={customer.id} />
             )}
           </Stack>
         </DialogContent>

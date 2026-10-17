@@ -18,6 +18,7 @@ const appointments: AppointmentDetail[] = [
     discountAmount: 10,
     total: 140,
     notes: "Cliente preferiu horário da tarde.",
+    usedReward: null,
     items: [
       {
         id: "item-1",
@@ -96,6 +97,7 @@ export const mockAppointmentServices: AppointmentServices = {
       discountAmount,
       total,
       notes: payload.notes ?? null,
+      usedReward: null,
       items: payload.items.map((item, index) => ({
         id: `item-${Date.now()}-${index}`,
         serviceId: item.serviceId,
@@ -104,6 +106,8 @@ export const mockAppointmentServices: AppointmentServices = {
         returnDueDate: null,
       })),
     });
+
+    return { grantedRewards: [] };
   },
   update: async (id: string, payload: SaveAppointmentPayload) => {
     await delay();

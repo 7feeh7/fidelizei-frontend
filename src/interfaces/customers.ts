@@ -1,3 +1,4 @@
+import type { CreateCustomerResponse } from "interfaces/customerRewards";
 import type { LeadSource } from "validators/customers";
 
 export interface CustomerListItem {
@@ -28,11 +29,12 @@ export interface CreateCustomerPayload {
   leadSource: LeadSource;
   dateOfBirth?: string | null;
   referrerId?: string;
+  isExistingCustomer?: boolean;
 }
 
 export interface CustomerServices {
   list(params: ListCustomersParams): Promise<ListCustomersResponse>;
-  create(payload: CreateCustomerPayload): Promise<void>;
+  create(payload: CreateCustomerPayload): Promise<CreateCustomerResponse>;
   update(id: string, payload: CreateCustomerPayload): Promise<void>;
   deactivate(id: string): Promise<void>;
 }

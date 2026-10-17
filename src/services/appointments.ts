@@ -1,4 +1,5 @@
 import { MOCK_API } from "config";
+import { CreateAppointmentResponse } from "interfaces/customerRewards";
 import {
   AppointmentDetail,
   AppointmentServices,
@@ -26,7 +27,9 @@ const apiAppointmentServices: AppointmentServices = {
   getById: (id: string) =>
     api.get<AppointmentDetail>(`appointments/${id}`).then((res) => res.data),
   create: (payload: SaveAppointmentPayload) =>
-    api.post("appointments", payload).then(() => undefined),
+    api
+      .post<CreateAppointmentResponse>("appointments", payload)
+      .then((res) => res.data),
   update: (id: string, payload: SaveAppointmentPayload) =>
     api.patch(`appointments/${id}`, payload).then(() => undefined),
 };

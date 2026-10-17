@@ -1,4 +1,5 @@
 import { MOCK_API } from "config";
+import { CreateCustomerResponse } from "interfaces/customerRewards";
 import {
   CreateCustomerPayload,
   CustomerServices,
@@ -17,7 +18,9 @@ const apiCustomerServices: CustomerServices = {
       })
       .then((res) => res.data),
   create: (payload: CreateCustomerPayload) =>
-    api.post("customers", payload).then(() => undefined),
+    api
+      .post<CreateCustomerResponse>("customers", payload)
+      .then((res) => res.data),
   update: (id: string, payload: CreateCustomerPayload) =>
     api.patch(`customers/${id}`, payload).then(() => undefined),
   deactivate: (id: string) =>

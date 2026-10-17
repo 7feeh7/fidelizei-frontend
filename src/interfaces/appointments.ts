@@ -1,3 +1,6 @@
+import type { CreateAppointmentResponse } from "interfaces/customerRewards";
+import type { LoyaltyRewardType } from "interfaces/loyaltyRules";
+
 export interface AppointmentListItem {
   id: string;
   customerId: string;
@@ -28,12 +31,23 @@ export interface AppointmentItemPayload {
   price: number;
 }
 
+export interface AppointmentUsedReward {
+  id: string;
+  ruleName: string;
+  rewardType: LoyaltyRewardType;
+  rewardValue: number | null;
+  freeServiceId: string | null;
+  rewardSummary: string;
+  preview: string;
+}
+
 export interface SaveAppointmentPayload {
   customerId: string;
   appointmentDate: string;
   loggedUserId: string;
   userId?: string | null;
   discountAmount?: number;
+  customerRewardId?: string | null;
   notes?: string | null;
   items: AppointmentItemPayload[];
 }
@@ -57,12 +71,13 @@ export interface AppointmentDetail {
   discountAmount: number;
   total: number;
   notes: string | null;
+  usedReward: AppointmentUsedReward | null;
   items: AppointmentItemDetail[];
 }
 
 export interface AppointmentServices {
   list(params?: ListAppointmentsParams): Promise<ListAppointmentsResponse>;
   getById(id: string): Promise<AppointmentDetail>;
-  create(payload: SaveAppointmentPayload): Promise<void>;
+  create(payload: SaveAppointmentPayload): Promise<CreateAppointmentResponse>;
   update(id: string, payload: SaveAppointmentPayload): Promise<void>;
 }

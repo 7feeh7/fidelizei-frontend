@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   Autocomplete,
   Box,
   IconButton,
@@ -17,19 +18,29 @@ import ActionButton from "components/ActionButton";
 import { RoundedButton } from "components/Button/RoundedButton";
 import { useAuth } from "contexts/AuthContext";
 import { useSnackbarContext } from "contexts/SnackbarContext";
+import {
+  CreateAppointmentResponse,
+  CustomerRewardListItem,
+} from "interfaces/customerRewards";
 import { SaveAppointmentPayload } from "interfaces/appointments";
 import { appointmentServices } from "services/appointments";
+import { customerRewardServices } from "services/customerRewards";
 import { customerServices } from "services/customers";
 import { serviceServices } from "services/services";
 import { userServices } from "services/users";
 import siteMap from "routes/siteMap";
 import { getApiErrorMessage } from "utils/apiError";
+import { formatGrantedRewardsMessage } from "utils/grantedRewardsMessage";
 import { formatCurrency, roundMoney } from "utils/currency";
 import {
   fromDateTimeLocalValue,
   toDateTimeLocalValue,
 } from "utils/datetime";
 import { isNumber } from "utils/math";
+import {
+  computeRewardDiscount,
+  isFreeServiceRewardApplicable,
+} from "utils/rewardDiscount";
 
 interface ServiceLine {
   key: string;
@@ -68,6 +79,7 @@ function AppointmentForm() {
   );
   const [userId, setUserId] = useState<string | null>(null);
   const [discountAmount, setDiscountAmount] = useState("0");
+  const [customerRewardId, setCustomerRewardId] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
   const [lines, setLines] = useState<ServiceLine[]>([createEmptyLine()]);
   const [isSaving, setIsSaving] = useState(false);
@@ -83,6 +95,11 @@ function AppointmentForm() {
     ["appointment", id],
     () => appointmentServices.getById(id as string),
     { enabled: isEditing }
+  );
+  const { data: availableRewardsData } = useQuery(
+    ["customer-rewards-available", customerId],
+    () => customerRewardServices.list(customerId as string, "AVAILABLE"),
+    { enabled: Boolean(customerId) }
   );
 
   const customerOptions: SelectOption[] = useMemo(
@@ -127,6 +144,7 @@ function AppointmentForm() {
     setUserId(appointmentDetail.userId);
     setDiscountAmount(String(appointmentDetail.discountAmount));
     setNotes(appointmentDetail.notes ?? "");
+    setCustomerRewardId(appointmentDetail.usedReward?.id ?? null);
     setLines(
       appointmentDetail.items.map((item) => ({
         key: item.id,
@@ -172,24 +190,125 @@ function AppointmentForm() {
     [parsedDiscount, subtotal]
   );
 
+  const rewardOptions: CustomerRewardListItem[] = useMemo(() => {
+    const now = Date.now();
+    const available = (availableRewardsData?.data ?? []).filter((reward) => {
+      if (!reward.expiresAt) {
+        return true;
+      }
+
+      return new Date(reward.expiresAt).getTime() >= now;
+    });
+
+    if (
+      isEditing &&
+      appointmentDetail?.usedReward &&
+      customerRewardId === appointmentDetail.usedReward.id &&
+      !available.some((reward) => reward.id === appointmentDetail.usedReward?.id)
+    ) {
+      const used = appointmentDetail.usedReward;
+      return [
+        ...available,
+        {
+          id: used.id,
+          customerId: appointmentDetail.customerId,
+          loyaltyRuleId: "",
+          referralId: null,
+          appointmentId: appointmentDetail.id,
+          status: "USED",
+          grantedAt: appointmentDetail.appointmentDate,
+          expiresAt: null,
+          usedAt: appointmentDetail.appointmentDate,
+          ruleName: used.ruleName,
+          rewardType: used.rewardType,
+          rewardValue: used.rewardValue,
+          freeServiceId: used.freeServiceId,
+          rewardSummary: used.rewardSummary,
+          triggerLabel: "",
+          preview: used.preview,
+        },
+      ];
+    }
+
+    return available;
+  }, [
+    availableRewardsData,
+    appointmentDetail,
+    customerRewardId,
+    isEditing,
+  ]);
+
+  const selectedReward = useMemo(
+    () => rewardOptions.find((reward) => reward.id === customerRewardId) ?? null,
+    [customerRewardId, rewardOptions]
+  );
+
+  const freeServiceRewardWarning = useMemo(() => {
+    if (!selectedReward || selectedReward.rewardType !== "FREE_SERVICE") {
+      return null;
+    }
+
+    if (
+      isFreeServiceRewardApplicable(selectedReward.freeServiceId, parsedLines)
+    ) {
+      return null;
+    }
+
+    return "Este benefício exige o serviço gratuito entre os itens do atendimento.";
+  }, [parsedLines, selectedReward]);
+
+  useEffect(() => {
+    if (!selectedReward) {
+      return;
+    }
+
+    const computedDiscount = computeRewardDiscount({
+      rewardType: selectedReward.rewardType,
+      rewardValue: selectedReward.rewardValue,
+      freeServiceId: selectedReward.freeServiceId,
+      subtotal,
+      items: parsedLines,
+    });
+
+    if (computedDiscount != null) {
+      setDiscountAmount(String(computedDiscount));
+    }
+  }, [parsedLines, selectedReward, subtotal]);
+
   async function refreshAppointmentsList() {
     await queryClient.resetQueries(["appointments"]);
   }
 
-  const saveMutation = useMutation(
-    (payload: SaveAppointmentPayload) =>
-      isEditing
-        ? appointmentServices.update(id as string, payload)
-        : appointmentServices.create(payload),
+  const saveMutation = useMutation<
+    CreateAppointmentResponse | void,
+    unknown,
+    SaveAppointmentPayload
+  >(
+    async (payload) => {
+      if (isEditing) {
+        await appointmentServices.update(id as string, payload);
+        return;
+      }
+      return appointmentServices.create(payload);
+    },
     {
-      onSuccess: async () => {
+      onSuccess: async (data) => {
         await refreshAppointmentsList();
         if (isEditing && id) {
           await queryClient.resetQueries(["appointment", id]);
         }
-        snackSuccess(
-          isEditing ? "Atendimento atualizado." : "Atendimento registrado."
-        );
+        if (isEditing) {
+          snackSuccess("Atendimento atualizado.");
+        } else {
+          const grantMessage = formatGrantedRewardsMessage(
+            data?.grantedRewards ?? []
+          );
+          snackSuccess(
+            grantMessage
+              ? `Atendimento registrado. ${grantMessage}`
+              : "Atendimento registrado."
+          );
+        }
         navigate(siteMap.protected.appointments);
       },
     }
@@ -254,6 +373,7 @@ function AppointmentForm() {
       loggedUserId: String(user.id),
       userId,
       discountAmount: parsedDiscount,
+      customerRewardId,
       notes: notes.trim() ? notes.trim() : null,
       items: parsedLines,
     };
@@ -305,7 +425,10 @@ function AppointmentForm() {
             <Autocomplete
               options={customerOptions}
               value={selectedCustomer}
-              onChange={(_, option) => setCustomerId(option?.value ?? null)}
+              onChange={(_, option) => {
+                setCustomerId(option?.value ?? null);
+                setCustomerRewardId(null);
+              }}
               isOptionEqualToValue={(option, value) =>
                 option.value === value.value
               }
@@ -422,9 +545,36 @@ function AppointmentForm() {
             })}
           </Stack>
 
+          <Autocomplete
+            options={rewardOptions}
+            value={selectedReward}
+            onChange={(_, option) => setCustomerRewardId(option?.id ?? null)}
+            getOptionLabel={(option) =>
+              `${option.ruleName} — ${option.rewardSummary}`
+            }
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            disabled={!customerId}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Benefício do cliente"
+                size="small"
+                placeholder={
+                  customerId
+                    ? "Selecione um benefício disponível"
+                    : "Selecione o cliente primeiro"
+                }
+              />
+            )}
+          />
+
+          {freeServiceRewardWarning && (
+            <Alert severity="warning">{freeServiceRewardWarning}</Alert>
+          )}
+
           <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
             <TextField
-              label="Desconto manual"
+              label={selectedReward ? "Desconto" : "Desconto manual"}
               size="small"
               type="number"
               inputProps={{ min: 0, step: "0.01" }}
@@ -462,6 +612,13 @@ function AppointmentForm() {
               </Typography>
             </Stack>
           </Box>
+
+          {isEditing && appointmentDetail?.usedReward && (
+            <Alert severity="info">
+              Benefício usado: {appointmentDetail.usedReward.ruleName} —{" "}
+              {appointmentDetail.usedReward.rewardSummary}
+            </Alert>
+          )}
 
           {isEditing && appointmentDetail && (
             <Stack spacing={1}>
