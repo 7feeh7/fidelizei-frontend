@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import siteMap from "./siteMap";
 
 export interface MenuItemConfig {
@@ -22,6 +23,11 @@ const menuItems: MenuItemConfig[] = [
     label: "Serviços",
     path: siteMap.protected.services,
     icon: <DesignServicesIcon />,
+  },
+  {
+    label: "Atendimentos",
+    path: siteMap.protected.appointments,
+    icon: <EventAvailableIcon />,
   },
 ];
 

@@ -9,6 +9,8 @@ import ResetPassword from "pages/ResetPassword";
 import Home from "pages/Home";
 import Customers from "pages/Customers";
 import Services from "pages/Services";
+import Appointments from "pages/Appointments";
+import AppointmentForm from "pages/AppointmentForm";
 
 export default function Router() {
   return (
@@ -27,6 +29,18 @@ export default function Router() {
           <Route path={siteMap.protected.home} element={<Home />} />
           <Route path={siteMap.protected.customers} element={<Customers />} />
           <Route path={siteMap.protected.services} element={<Services />} />
+          <Route
+            path={siteMap.protected.appointments}
+            element={<Appointments />}
+          />
+          <Route
+            path={siteMap.protected.newAppointment}
+            element={<AppointmentForm />}
+          />
+          <Route
+            path={`${siteMap.protected.appointments}/:id`}
+            element={<AppointmentForm />}
+          />
         </Route>
         <Route
           path="*"

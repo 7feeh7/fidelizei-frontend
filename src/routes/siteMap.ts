@@ -10,5 +10,7 @@ export default {
     example: "/exemplo",
     customers: "/clientes",
     services: "/servicos",
+    appointments: "/atendimentos",
+    newAppointment: "/atendimentos/novo",
   },
 };
