@@ -11,9 +11,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, Resolver, useForm, useWatch } from "react-hook-form";
 import { useQuery } from "react-query";
 import ActionButton from "components/ActionButton";
-import CustomerMessagesPanel from "components/Customers/CustomerMessagesPanel";
-import CustomerRewardsPanel from "components/Customers/CustomerRewardsPanel";
-import { RoundedButton } from "components/Button/RoundedButton";
 import SimpleDialog from "components/Dialogs/SimpleDialog";
 import FastDialogTitle from "components/Dialogs/FastDialogTitle";
 import AutoCompleteField from "components/Forms/AutoCompleteField";
@@ -41,7 +38,6 @@ interface CreateCustomerDialogProps {
   onClose: () => void;
   onSubmit: (payload: CreateCustomerPayload) => Promise<void>;
   customer?: CustomerListItem | null;
-  onSendMessage?: () => void;
 }
 
 function formatDateOfBirth(value: string | null | undefined) {
@@ -57,17 +53,11 @@ function CreateCustomerDialog({
   onClose,
   onSubmit,
   customer = null,
-  onSendMessage,
 }: CreateCustomerDialogProps) {
   const isEditing = Boolean(customer);
   const hasExistingReferrer = Boolean(customer?.referrerId);
   const [isSaving, setIsSaving] = useState(false);
 
-  const { data: returnSummary } = useQuery(
-    ["customer-return-summary", customer?.id],
-    () => customerServices.getReturnSummary(customer!.id),
-    { enabled: Boolean(customer?.id) }
-  );
   const {
     control,
     handleSubmit,
@@ -183,7 +173,7 @@ function CreateCustomerDialog({
   return (
     <SimpleDialog
       open={open}
-      maxWidth="md"
+      maxWidth="sm"
       fullWidth
       onClose={(_, reason) => {
         if (reason !== "backdropClick") {
@@ -275,26 +265,7 @@ function CreateCustomerDialog({
                 <Typography variant="body2" color="text.secondary">
                   Indicações feitas: {customer?.referralsMadeCount ?? 0}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Próximo retorno sugerido:{" "}
-                  {returnSummary?.nextSuggestedReturnDate
-                    ? new Date(
-                        `${returnSummary.nextSuggestedReturnDate}T12:00:00`
-                      ).toLocaleDateString("pt-BR")
-                    : "—"}
-                </Typography>
               </Stack>
-            )}
-            {isEditing && customer && onSendMessage && (
-              <RoundedButton onClick={onSendMessage} sx={{ alignSelf: "flex-start" }}>
-                Enviar mensagem
-              </RoundedButton>
-            )}
-            {isEditing && customer && (
-              <CustomerRewardsPanel customerId={customer.id} />
-            )}
-            {isEditing && customer && (
-              <CustomerMessagesPanel customerId={customer.id} />
             )}
           </Stack>
         </DialogContent>

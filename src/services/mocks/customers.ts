@@ -212,6 +212,27 @@ export const mockCustomerServices: CustomerServices = {
     await delay(200);
     return { nextSuggestedReturnDate: "2026-11-01" };
   },
+  async getSummary(customerId: string) {
+    await delay(300);
+    const customer = customers.find((entry) => entry.id === customerId);
+
+    if (!customer) {
+      throw new Error("Cliente não encontrado");
+    }
+
+    return {
+      ...customer,
+      indicators: {
+        totalVisits: 3,
+        totalSpent: 450,
+        averageTicket: 150,
+        lastVisitDate: "2026-09-20",
+        daysSinceLastVisit: 27,
+      },
+      nextSuggestedReturnDate: "2026-11-01",
+      expiringSoonRewards: [],
+    };
+  },
   async listMonthlyBirthdays(params: ListMonthlyBirthdaysParams = {}) {
     await delay(300);
     const now = new Date();

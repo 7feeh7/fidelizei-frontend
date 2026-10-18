@@ -61,7 +61,13 @@ function countPending() {
   ).length;
 }
 
-function filterMessages(status?: MessageStatus, customerId?: string) {
+function filterMessages(
+  status?: MessageStatus,
+  customerId?: string,
+  scheduledUntil?: string
+) {
+  const today = new Date().toISOString().slice(0, 10);
+
   return mockMessages.filter((item) => {
     if (status && item.status !== status) {
       return false;
@@ -69,7 +75,11 @@ function filterMessages(status?: MessageStatus, customerId?: string) {
     if (customerId && item.customerId !== customerId) {
       return false;
     }
-    if (status === "PENDING" && item.scheduledFor > new Date().toISOString().slice(0, 10)) {
+    if (
+      !customerId &&
+      status === "PENDING" &&
+      item.scheduledFor > (scheduledUntil ?? today)
+    ) {
       return false;
     }
     return true;
@@ -77,10 +87,29 @@ function filterMessages(status?: MessageStatus, customerId?: string) {
 }
 
 export const mockMessageServices: MessageServices = {
-  list: async (params) => ({
-    data: filterMessages(params?.status, params?.customerId),
-    pendingCount: countPending(),
-  }),
+  list: async (params) => {
+    const page = params?.page ?? 1;
+    const perPage = params?.perPage ?? 10;
+    const filtered = filterMessages(
+      params?.status,
+      params?.customerId,
+      params?.scheduledUntil
+    ).sort((a, b) =>
+      params?.customerId
+        ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        : 0
+    );
+    const totalPages =
+      filtered.length === 0 ? 0 : Math.ceil(filtered.length / perPage);
+    const start = (page - 1) * perPage;
+
+    return {
+      data: filtered.slice(start, start + perPage),
+      pendingCount: countPending(),
+      page,
+      totalPages: totalPages || (filtered.length > 0 ? 1 : 0),
+    };
+  },
   pendingCount: async () => ({ pendingCount: countPending() }),
   createForCustomer: async (customerId, payload) => {
     const content =

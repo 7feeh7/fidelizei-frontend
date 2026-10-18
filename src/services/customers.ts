@@ -3,6 +3,7 @@ import { CreateCustomerResponse } from "interfaces/customerRewards";
 import {
   CreateCustomerPayload,
   CustomerReturnSummaryResponse,
+  CustomerSummaryResponse,
   CustomerServices,
   ListCustomersResponse,
   ListMonthlyBirthdaysParams,
@@ -33,6 +34,10 @@ const apiCustomerServices: CustomerServices = {
       .get<CustomerReturnSummaryResponse>(
         `customers/${customerId}/return-summary`
       )
+      .then((res) => res.data),
+  getSummary: (customerId: string) =>
+    api
+      .get<CustomerSummaryResponse>(`customers/${customerId}/summary`)
       .then((res) => res.data),
   listMonthlyBirthdays: (params: ListMonthlyBirthdaysParams = {}) =>
     api

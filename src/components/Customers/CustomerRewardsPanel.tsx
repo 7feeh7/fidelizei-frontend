@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Chip,
@@ -12,7 +12,12 @@ import {
   Typography,
 } from "@mui/material";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "react-query";
 import { RoundedButton } from "components/Button/RoundedButton";
 import ConfirmDialog from "components/Dialogs/ConfirmDialog";
 import SimpleDialog from "components/Dialogs/SimpleDialog";
@@ -31,6 +36,7 @@ import {
   CustomerRewardStatus,
 } from "interfaces/customerRewards";
 import { customerRewardServices } from "services/customerRewards";
+import { getNextPageParam } from "utils/query";
 import { loyaltyRuleServices } from "services/loyaltyRules";
 import { getApiErrorMessage } from "utils/apiError";
 import { formatGrantedRewardsMessage } from "utils/grantedRewardsMessage";
@@ -67,9 +73,17 @@ function formatValidity(reward: CustomerRewardListItem) {
 
 interface CustomerRewardsPanelProps {
   customerId: string;
+  grantDialogOpen?: boolean;
+  onGrantDialogClose?: () => void;
+  showGrantButton?: boolean;
 }
 
-function CustomerRewardsPanel({ customerId }: CustomerRewardsPanelProps) {
+function CustomerRewardsPanel({
+  customerId,
+  grantDialogOpen = false,
+  onGrantDialogClose,
+  showGrantButton = true,
+}: CustomerRewardsPanelProps) {
   const [statusFilter, setStatusFilter] = useState<
     CustomerRewardStatus | "ALL"
   >("ALL");
@@ -80,10 +94,29 @@ function CustomerRewardsPanel({ customerId }: CustomerRewardsPanelProps) {
   const queryClient = useQueryClient();
   const { snackSuccess, snackError } = useSnackbarContext();
 
-  const { data, isLoading } = useQuery(
-    ["customer-rewards", customerId],
-    () => customerRewardServices.list(customerId),
-    { enabled: Boolean(customerId) }
+  useEffect(() => {
+    if (grantDialogOpen) {
+      setGrantOpen(true);
+    }
+  }, [grantDialogOpen]);
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteQuery(
+    ["customer-rewards", customerId, statusFilter],
+    ({ pageParam = 1 }) =>
+      customerRewardServices.list(customerId, {
+        page: pageParam,
+        status: statusFilter === "ALL" ? undefined : statusFilter,
+      }),
+    {
+      enabled: Boolean(customerId),
+      getNextPageParam,
+    }
   );
 
   const { data: loyaltyRulesData } = useQuery(
@@ -92,13 +125,10 @@ function CustomerRewardsPanel({ customerId }: CustomerRewardsPanelProps) {
     { enabled: grantOpen }
   );
 
-  const rewards = useMemo(() => {
-    const items = data?.data ?? [];
-    if (statusFilter === "ALL") {
-      return items;
-    }
-    return items.filter((item) => item.status === statusFilter);
-  }, [data, statusFilter]);
+  const rewards = useMemo(
+    () => data?.pages.flatMap((page) => page.data) ?? [],
+    [data]
+  );
 
   const activeRuleOptions = useMemo(
     () =>
@@ -117,6 +147,7 @@ function CustomerRewardsPanel({ customerId }: CustomerRewardsPanelProps) {
     {
       onSuccess: async (response) => {
         await queryClient.invalidateQueries(["customer-rewards", customerId]);
+        await queryClient.invalidateQueries(["customer-summary", customerId]);
         snackSuccess(
           formatGrantedRewardsMessage([
             {
@@ -138,6 +169,7 @@ function CustomerRewardsPanel({ customerId }: CustomerRewardsPanelProps) {
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(["customer-rewards", customerId]);
+        await queryClient.invalidateQueries(["customer-summary", customerId]);
         snackSuccess("Benefício cancelado.");
         setRewardToCancel(null);
       },
@@ -189,9 +221,11 @@ function CustomerRewardsPanel({ customerId }: CustomerRewardsPanelProps) {
             Benefícios
           </Typography>
         </Stack>
-        <RoundedButton size="small" onClick={() => setGrantOpen(true)}>
-          Conceder cortesia
-        </RoundedButton>
+        {showGrantButton && (
+          <RoundedButton size="small" onClick={() => setGrantOpen(true)}>
+            Conceder cortesia
+          </RoundedButton>
+        )}
       </Stack>
 
       <Tabs
@@ -213,6 +247,13 @@ function CustomerRewardsPanel({ customerId }: CustomerRewardsPanelProps) {
             Nenhum benefício neste filtro.
           </Typography>
         }
+        onScrolledToEnd={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        }}
+        isFetchingNextPage={isFetchingNextPage}
+        contentHeight="min(36vh, 320px)"
       >
         <Table size="small">
           <TableHead>
@@ -256,11 +297,20 @@ function CustomerRewardsPanel({ customerId }: CustomerRewardsPanelProps) {
         </Table>
       </TableContainer>
 
-      <SimpleDialog open={grantOpen} onClose={() => setGrantOpen(false)} maxWidth="sm" fullWidth>
+      <SimpleDialog
+        open={grantOpen}
+        onClose={() => {
+          setGrantOpen(false);
+          onGrantDialogClose?.();
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
         <FastDialogTitle
           label="Conceder benefício (cortesia)"
           closeButton={() => {
             setGrantOpen(false);
+            onGrantDialogClose?.();
             setSelectedRuleId("");
           }}
         />
@@ -290,6 +340,7 @@ function CustomerRewardsPanel({ customerId }: CustomerRewardsPanelProps) {
                 color="inherit"
                 onClick={() => {
                   setGrantOpen(false);
+                  onGrantDialogClose?.();
                   setSelectedRuleId("");
                 }}
               >

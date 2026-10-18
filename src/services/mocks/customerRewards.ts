@@ -8,8 +8,22 @@ import {
 const mockRewards: CustomerRewardListItem[] = [];
 
 export const mockCustomerRewardServices: CustomerRewardServices = {
-  list: async () =>
-    Promise.resolve<ListCustomerRewardsResponse>({ data: mockRewards }),
+  list: async (_customerId, params) => {
+    const page = params?.page ?? 1;
+    const perPage = params?.perPage ?? 10;
+    const filtered = params?.status
+      ? mockRewards.filter((item) => item.status === params.status)
+      : mockRewards;
+    const totalPages =
+      filtered.length === 0 ? 0 : Math.ceil(filtered.length / perPage);
+    const start = (page - 1) * perPage;
+
+    return Promise.resolve<ListCustomerRewardsResponse>({
+      data: filtered.slice(start, start + perPage),
+      page,
+      totalPages: totalPages || (filtered.length > 0 ? 1 : 0),
+    });
+  },
   grantManual: async (customerId, loyaltyRuleId) =>
     Promise.resolve<GrantManualCustomerRewardResponse>({
       reward: {

@@ -32,8 +32,16 @@ export interface CustomerRewardListItem {
   preview: string;
 }
 
+export interface ListCustomerRewardsParams {
+  status?: CustomerRewardStatus;
+  page?: number;
+  perPage?: number;
+}
+
 export interface ListCustomerRewardsResponse {
   data: CustomerRewardListItem[];
+  page: number;
+  totalPages: number;
 }
 
 export interface CreateCustomerResponse {
@@ -51,7 +59,7 @@ export interface GrantManualCustomerRewardResponse {
 export interface CustomerRewardServices {
   list(
     customerId: string,
-    status?: CustomerRewardStatus
+    params?: ListCustomerRewardsParams
   ): Promise<ListCustomerRewardsResponse>;
   grantManual(
     customerId: string,

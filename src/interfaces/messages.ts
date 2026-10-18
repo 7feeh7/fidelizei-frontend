@@ -32,11 +32,15 @@ export interface ListMessagesParams {
   customerId?: string;
   scheduledUntil?: string;
   scheduledFrom?: string;
+  page?: number;
+  perPage?: number;
 }
 
 export interface ListMessagesResponse {
   data: MessageListItem[];
   pendingCount: number;
+  page: number;
+  totalPages: number;
 }
 
 export interface CreateCustomerMessagePayload {

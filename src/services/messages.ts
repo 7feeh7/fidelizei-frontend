@@ -11,10 +11,17 @@ import type {
 import { api } from "./api";
 import { mockMessageServices } from "./mocks/messages";
 
+export const MESSAGES_PAGE_SIZE = 10;
+
 const apiMessageServices: MessageServices = {
   list: (params) =>
     api
-      .get<ListMessagesResponse>("messages", { params })
+      .get<ListMessagesResponse>("messages", {
+        params: {
+          ...params,
+          perPage: params?.perPage ?? MESSAGES_PAGE_SIZE,
+        },
+      })
       .then((res) => res.data),
   pendingCount: () =>
     api

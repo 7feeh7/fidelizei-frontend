@@ -9,6 +9,7 @@ export default {
     home: "/",
     example: "/exemplo",
     customers: "/clientes",
+    customerProfile: "/clientes/:customerId",
     services: "/servicos",
     appointments: "/atendimentos",
     newAppointment: "/atendimentos/novo",

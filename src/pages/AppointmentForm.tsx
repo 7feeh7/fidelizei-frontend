@@ -98,7 +98,10 @@ function AppointmentForm() {
   );
   const { data: availableRewardsData } = useQuery(
     ["customer-rewards-available", customerId],
-    () => customerRewardServices.list(customerId as string, "AVAILABLE"),
+    () =>
+      customerRewardServices.list(customerId as string, {
+        status: "AVAILABLE",
+      }),
     { enabled: Boolean(customerId) }
   );
 

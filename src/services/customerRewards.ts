@@ -7,11 +7,17 @@ import {
 import { api } from "./api";
 import { mockCustomerRewardServices } from "./mocks/customerRewards";
 
+export const CUSTOMER_REWARDS_PAGE_SIZE = 10;
+
 const apiCustomerRewardServices: CustomerRewardServices = {
-  list: (customerId, status) =>
+  list: (customerId, params) =>
     api
       .get<ListCustomerRewardsResponse>(`customers/${customerId}/rewards`, {
-        params: status ? { status } : undefined,
+        params: {
+          status: params?.status,
+          page: params?.page,
+          perPage: params?.perPage ?? CUSTOMER_REWARDS_PAGE_SIZE,
+        },
       })
       .then((res) => res.data),
   grantManual: (customerId, loyaltyRuleId) =>

@@ -9,6 +9,7 @@ import {
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import SendIcon from "@mui/icons-material/Send";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useNavigate } from "react-router-dom";
@@ -46,6 +47,17 @@ function CustomerRowActions({
         <MoreVertIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            navigate(`${siteMap.protected.customers}/${customer.id}`);
+          }}
+        >
+          <ListItemIcon>
+            <PersonOutlineIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Ver ficha</ListItemText>
+        </MenuItem>
         <MenuItem
           onClick={() => {
             handleClose();

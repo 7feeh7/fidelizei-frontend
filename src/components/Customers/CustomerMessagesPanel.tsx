@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Chip, Stack, Typography } from "@mui/material";
-import { useQuery } from "react-query";
+import { useInfiniteQuery } from "react-query";
 import {
   Table,
   TableBody,
@@ -12,6 +12,7 @@ import {
 import { MessageListItem } from "interfaces/messages";
 import { messageServices } from "services/messages";
 import { formatMessageTemplateType } from "utils/messageTemplatePresentation";
+import { getNextPageParam } from "utils/query";
 
 interface CustomerMessagesPanelProps {
   customerId: string;
@@ -27,34 +28,63 @@ function formatSentInfo(message: MessageListItem) {
     return "Descartada";
   }
 
+  if (message.status === "PENDING") {
+    return `Agendada para ${new Date(message.scheduledFor).toLocaleDateString("pt-BR")}`;
+  }
+
   return "—";
 }
 
+const STATUS_LABELS: Record<MessageListItem["status"], string> = {
+  PENDING: "Pendente",
+  SENT: "Enviada",
+  CANCELED: "Descartada",
+};
+
 function CustomerMessagesPanel({ customerId }: CustomerMessagesPanelProps) {
-  const { data, isLoading } = useQuery(
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteQuery(
     ["customer-messages", customerId],
-    async () => {
-      const [sent, canceled] = await Promise.all([
-        messageServices.list({ customerId, status: "SENT" }),
-        messageServices.list({ customerId, status: "CANCELED" }),
-      ]);
-      return [...sent.data, ...canceled.data].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    },
-    { enabled: Boolean(customerId) }
+    ({ pageParam = 1 }) =>
+      messageServices.list({ customerId, page: pageParam }),
+    {
+      enabled: Boolean(customerId),
+      getNextPageParam,
+    }
   );
 
-  const messages = useMemo(() => data ?? [], [data]);
+  const messages = useMemo(
+    () => data?.pages.flatMap((page) => page.data) ?? [],
+    [data]
+  );
 
   return (
     <Stack spacing={2}>
       <Typography variant="subtitle1" fontWeight={700}>
-        Histórico de mensagens
+        Mensagens
       </Typography>
-      <TableContainer isLoading={isLoading}>
-        <Table size="small">
+      <TableContainer
+        isLoading={isLoading}
+        isEmpty={!isLoading && messages.length === 0}
+        emptyFeedback={
+          <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
+            Nenhuma mensagem registrada.
+          </Typography>
+        }
+        onScrolledToEnd={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        }}
+        isFetchingNextPage={isFetchingNextPage}
+        contentHeight="min(36vh, 320px)"
+      >
+        <Table size="small" stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>Motivo</TableCell>
@@ -64,36 +94,30 @@ function CustomerMessagesPanel({ customerId }: CustomerMessagesPanelProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {messages.length === 0 && !isLoading ? (
-              <TableRow>
-                <TableCell colSpan={4}>
-                  Nenhuma mensagem no histórico.
+            {messages.map((message) => (
+              <TableRow key={message.id}>
+                <TableCell>
+                  {formatMessageTemplateType(message.type)}
                 </TableCell>
+                <TableCell sx={{ whiteSpace: "pre-wrap" }}>
+                  {message.content}
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    size="small"
+                    label={STATUS_LABELS[message.status]}
+                    color={
+                      message.status === "SENT"
+                        ? "success"
+                        : message.status === "PENDING"
+                          ? "warning"
+                          : "default"
+                    }
+                  />
+                </TableCell>
+                <TableCell>{formatSentInfo(message)}</TableCell>
               </TableRow>
-            ) : (
-              messages.map((message) => (
-                <TableRow key={message.id}>
-                  <TableCell>
-                    {formatMessageTemplateType(message.type)}
-                  </TableCell>
-                  <TableCell sx={{ whiteSpace: "pre-wrap" }}>
-                    {message.content}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      size="small"
-                      label={
-                        message.status === "SENT" ? "Enviada" : "Descartada"
-                      }
-                      color={
-                        message.status === "SENT" ? "success" : "default"
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>{formatSentInfo(message)}</TableCell>
-                </TableRow>
-              ))
-            )}
+            ))}
           </TableBody>
         </Table>
       </TableContainer>

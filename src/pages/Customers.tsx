@@ -299,9 +299,6 @@ function Customers() {
         customer={editingCustomer}
         onClose={() => setEditingCustomer(null)}
         onSubmit={handleUpdate}
-        onSendMessage={
-          editingCustomer ? () => setMessageCustomer(editingCustomer) : undefined
-        }
       />
 
       <SendCustomerMessageDialog

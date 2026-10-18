@@ -1,4 +1,5 @@
 import type { CreateCustomerResponse } from "interfaces/customerRewards";
+import type { CustomerRewardListItem } from "interfaces/customerRewards";
 import type { LeadSource } from "validators/customers";
 
 export interface CustomerListItem {
@@ -36,6 +37,26 @@ export interface CustomerReturnSummaryResponse {
   nextSuggestedReturnDate: string | null;
 }
 
+export interface CustomerSummaryResponse {
+  id: string;
+  name: string;
+  phone: string;
+  dateOfBirth: string | null;
+  leadSource: LeadSource;
+  referrerId: string | null;
+  referrerName: string | null;
+  referralsMadeCount: number;
+  indicators: {
+    totalVisits: number;
+    totalSpent: number;
+    averageTicket: number | null;
+    lastVisitDate: string | null;
+    daysSinceLastVisit: number | null;
+  };
+  nextSuggestedReturnDate: string | null;
+  expiringSoonRewards: CustomerRewardListItem[];
+}
+
 export interface MonthlyBirthdayItem {
   id: string;
   name: string;
@@ -61,6 +82,7 @@ export interface CustomerServices {
   update(id: string, payload: CreateCustomerPayload): Promise<void>;
   deactivate(id: string): Promise<void>;
   getReturnSummary(customerId: string): Promise<CustomerReturnSummaryResponse>;
+  getSummary(customerId: string): Promise<CustomerSummaryResponse>;
   listMonthlyBirthdays(
     params?: ListMonthlyBirthdaysParams
   ): Promise<ListMonthlyBirthdaysResponse>;
