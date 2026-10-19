@@ -14,16 +14,16 @@ Em desenvolvimento o app roda com **mock** (`VITE_APP_MOCK_API=true` em `.env.de
 
 ## Personalização rápida — `src/app.config.ts`
 
-| Opção | Valores | O que faz |
-| --- | --- | --- |
-| `name` | texto | Nome do produto (título da aba, textos) |
-| `logo.full` | caminho em `public/` | Logo grande das telas de login |
-| `logo.compact` | caminho em `public/` | Logo da barra superior |
-| `auth.layout` | `"split"` \| `"centered"` | `split`: logo de um lado, formulário do outro. `centered`: card no centro |
-| `auth.formSide` | `"right"` \| `"left"` | Lado do formulário no `split` (a logo fica no lado oposto) |
-| `menu.layout` | `"vertical"` \| `"horizontal"` | Menu lateral ou na barra superior |
-| `menu.width` | número (px) | Largura do menu vertical |
-| `content.maxWidth` | `"sm"` \| `"md"` \| `"lg"` \| `"xl"` \| `false` | Largura máxima do conteúdo |
+| Opção              | Valores                                         | O que faz                                                                 |
+| ------------------ | ----------------------------------------------- | ------------------------------------------------------------------------- |
+| `name`             | texto                                           | Nome do produto (título da aba, textos)                                   |
+| `logo.full`        | caminho em `public/`                            | Logo grande das telas de login                                            |
+| `logo.compact`     | caminho em `public/`                            | Logo da barra superior                                                    |
+| `auth.layout`      | `"split"` \| `"centered"`                       | `split`: logo de um lado, formulário do outro. `centered`: card no centro |
+| `auth.formSide`    | `"right"` \| `"left"`                           | Lado do formulário no `split` (a logo fica no lado oposto)                |
+| `menu.layout`      | `"vertical"` \| `"horizontal"`                  | Menu lateral ou na barra superior                                         |
+| `menu.width`       | número (px)                                     | Largura do menu vertical                                                  |
+| `content.maxWidth` | `"sm"` \| `"md"` \| `"lg"` \| `"xl"` \| `false` | Largura máxima do conteúdo                                                |
 
 No mobile (abaixo de `md`) o login `split` vira `centered` e os dois menus viram um drawer aberto pelo botão hambúrguer.
 
@@ -55,23 +55,27 @@ Uma tela pode fugir do padrão passando props: `<AuthContainer layout="centered"
 
 ## Variáveis de ambiente
 
-| Variável | Descrição |
-| --- | --- |
-| `VITE_APP_API_URL` | URL base da API, com `/` no final |
-| `VITE_APP_MOCK_API` | `true` para usar os mocks |
+| Variável            | Descrição                         |
+| ------------------- | --------------------------------- |
+| `VITE_APP_API_URL`  | URL base da API, com `/` no final |
+| `VITE_APP_MOCK_API` | `true` para usar os mocks         |
 
 Arquivos: `.env.development` (`yarn dev`), `.env.homolog` (`yarn build:homolog`), `.env.production` (`yarn build:prod`). Para sobrescrever na sua máquina sem commitar, crie `.env.development.local`. Modelo em `.env.example`.
 
+## Documentação
+
+- [Deploy na AWS (S3 + CloudFront)](docs/deploy.md)
+
 ## Scripts
 
-| Script | Descrição |
-| --- | --- |
-| `yarn dev` | Servidor de desenvolvimento |
-| `yarn typecheck` | Checagem de tipos (`tsc`) |
-| `yarn lint` | ESLint (falha com qualquer warning) |
-| `yarn build:homolog` | Typecheck + build com `.env.homolog` |
-| `yarn build:prod` | Typecheck + build com `.env.production` |
-| `yarn preview` | Serve o build localmente |
+| Script               | Descrição                               |
+| -------------------- | --------------------------------------- |
+| `yarn dev`           | Servidor de desenvolvimento             |
+| `yarn typecheck`     | Checagem de tipos (`tsc`)               |
+| `yarn lint`          | ESLint (falha com qualquer warning)     |
+| `yarn build:homolog` | Typecheck + build com `.env.homolog`    |
+| `yarn build:prod`    | Typecheck + build com `.env.production` |
+| `yarn preview`       | Serve o build localmente                |
 
 ## Estrutura
 

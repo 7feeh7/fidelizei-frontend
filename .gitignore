@@ -25,3 +25,8 @@ dist-ssr
 
 # variáveis locais (use .env.<modo>.local para sobrescrever sem commitar)
 .env
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*

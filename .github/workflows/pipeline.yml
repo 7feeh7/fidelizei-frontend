@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    name: Quality
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Linting
+        run: yarn lint
+
+      - name: Typechecking
+        run: yarn typecheck
+
+  cd:
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    name: Deploy to S3 and CloudFront
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      AWS_REGION: us-east-1
+      S3_BUCKET: fidelizei-frontend-7feeh7
+      DEPLOY_ROLE_SUFFIX: fidelizei-frontend-github-deploy
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build production
+        run: yarn build:prod
+
+      - name: Validar secret AWS_ROLE_ARN
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$AWS_ROLE_ARN" ]; then
+            echo "::error::Defina o secret AWS_ROLE_ARN em Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          if ! [[ "$AWS_ROLE_ARN" =~ ^arn:aws:iam::[0-9]{12}:role/[A-Za-z0-9+=,.@_-]+$ ]]; then
+            echo "::error::AWS_ROLE_ARN não é um ARN de role IAM válido."
+            exit 1
+          fi
+          if [[ "$AWS_ROLE_ARN" != *":role/${DEPLOY_ROLE_SUFFIX}" ]]; then
+            echo "::error::AWS_ROLE_ARN deve apontar para a role ${DEPLOY_ROLE_SUFFIX} (output github_deploy_role_arn do Terraform)."
+            exit 1
+          fi
+
+      - name: Validar variable CLOUDFRONT_DISTRIBUTION_ID
+        env:
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "$CLOUDFRONT_DISTRIBUTION_ID" ]; then
+            echo "::error::Defina a variable CLOUDFRONT_DISTRIBUTION_ID em Settings → Secrets and variables → Actions (output cloudfront_distribution_id do Terraform)."
+            exit 1
+          fi
+          if ! [[ "$CLOUDFRONT_DISTRIBUTION_ID" =~ ^[A-Z0-9]+$ ]]; then
+            echo "::error::CLOUDFRONT_DISTRIBUTION_ID não parece um ID válido de distribution CloudFront."
+            exit 1
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          audience: sts.amazonaws.com
+          role-skip-session-tagging: true
+
+      - name: Sync static assets to S3
+        run: |
+          aws s3 sync dist/ "s3://${S3_BUCKET}/" \
+            --delete \
+            --cache-control "public, max-age=31536000, immutable" \
+            --exclude "index.html"
+
+      - name: Upload index.html to S3
+        run: |
+          aws s3 cp dist/index.html "s3://${S3_BUCKET}/index.html" \
+            --cache-control "public, max-age=0, must-revalidate" \
+            --content-type "text/html; charset=utf-8"
+
+      - name: Invalidate CloudFront cache
+        env:
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+            --paths "/*" \
+            --query "Invalidation.Id" --output text
