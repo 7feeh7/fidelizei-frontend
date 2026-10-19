@@ -19,13 +19,14 @@ export default defineConfig(({ mode }) => {
     },
   },
   build: {
+    // Separar @mui/@emotion do React em chunks distintos cria um import
+    // circular: o chunk do MUI lê useLayoutEffect antes do React inicializar
+    // e a tela de produção abre em branco.
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
       output: {
-        // separa as libs em chunks próprios (evita o aviso de chunk > 500kB)
         manualChunks(id) {
-          if (!id.includes("node_modules")) return;
-          if (id.includes("@mui") || id.includes("@emotion")) return "mui";
-          return "vendor";
+          if (id.includes("node_modules")) return "vendor";
         },
       },
     },
