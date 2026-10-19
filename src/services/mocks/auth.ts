@@ -1,6 +1,12 @@
 import { AuthServices } from "interfaces/auth";
 import { delay } from "./delay";
 
+const mockCurrentUser = {
+  id: "user-1",
+  name: "Profissional Demo",
+  email: "demo@fidelizei.com",
+};
+
 /** Aceita qualquer email/senha que passe na validação do formulário. */
 export const mockAuthServices: AuthServices = {
   async signIn() {
@@ -10,6 +16,10 @@ export const mockAuthServices: AuthServices = {
       refresh_token: "mock-refresh-token",
       expires_in: 86_400,
     };
+  },
+  async getMe() {
+    await delay();
+    return mockCurrentUser;
   },
   async requestNewPassword() {
     await delay();

@@ -11,7 +11,7 @@ import { useQueryClient } from "react-query";
 import { SignInPayload, User } from "interfaces/auth";
 import { authServices } from "services/auth";
 import { setUnauthorizedHandler } from "services/handlers";
-import { userFromAccessToken } from "utils/jwt";
+import { userFromAccessToken, userFromMe } from "utils/jwt";
 import {
   accessTokenStorage,
   refreshTokenStorage,
@@ -44,22 +44,29 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return null;
   });
 
-  const signIn = useCallback(async (payload: SignInPayload) => {
-    const response = await authServices.signIn(payload);
-    const authenticatedUser = userFromAccessToken(
-      response.access_token,
-      payload.email
-    );
-
-    accessTokenStorage.set(response.access_token);
-    if (response.refresh_token) {
-      refreshTokenStorage.set(response.refresh_token);
-    }
+  const syncAuthenticatedUser = useCallback(async () => {
+    const profile = await authServices.getMe();
+    const authenticatedUser = userFromMe(profile);
     userStorage.set(authenticatedUser);
     setUser(authenticatedUser);
-    setToken(response.access_token);
     return authenticatedUser;
   }, []);
+
+  const signIn = useCallback(
+    async (payload: SignInPayload) => {
+      const response = await authServices.signIn(payload);
+
+      accessTokenStorage.set(response.access_token);
+      if (response.refresh_token) {
+        refreshTokenStorage.set(response.refresh_token);
+      }
+      setToken(response.access_token);
+
+      const authenticatedUser = await syncAuthenticatedUser();
+      return authenticatedUser;
+    },
+    [syncAuthenticatedUser]
+  );
 
   const signOut = useCallback(() => {
     accessTokenStorage.destroy();
@@ -74,6 +81,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setUnauthorizedHandler(signOut);
     return () => setUnauthorizedHandler(undefined);
   }, [signOut]);
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+
+    syncAuthenticatedUser().catch(() => undefined);
+  }, [token, syncAuthenticatedUser]);
 
   const value = useMemo(
     () => ({ user, isAuthenticated: !!token, signIn, signOut }),

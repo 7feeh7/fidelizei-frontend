@@ -1,5 +1,5 @@
 import { MOCK_API } from "config";
-import { AuthServices, SignInResponse } from "interfaces/auth";
+import { AuthServices, MeResponse, SignInResponse } from "interfaces/auth";
 import { api } from "./api";
 import { mockAuthServices } from "./mocks/auth";
 
@@ -7,6 +7,7 @@ import { mockAuthServices } from "./mocks/auth";
 const apiAuthServices: AuthServices = {
   signIn: (payload) =>
     api.post<SignInResponse>("login", payload).then((res) => res.data),
+  getMe: () => api.get<MeResponse>("me").then((res) => res.data),
   requestNewPassword: (email) =>
     api.post("password/request", { email }).then(() => undefined),
   resetPassword: (payload) =>

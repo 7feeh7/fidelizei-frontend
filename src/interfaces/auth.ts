@@ -17,6 +17,12 @@ export interface SignInResponse {
   expires_in: number;
 }
 
+export interface MeResponse {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export interface ResetPasswordPayload {
   email: string;
   code: string;
@@ -25,6 +31,7 @@ export interface ResetPasswordPayload {
 
 export interface AuthServices {
   signIn(payload: SignInPayload): Promise<SignInResponse>;
+  getMe(): Promise<MeResponse>;
   requestNewPassword(email: string): Promise<void>;
   resetPassword(payload: ResetPasswordPayload): Promise<void>;
 }

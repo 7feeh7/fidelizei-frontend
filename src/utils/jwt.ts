@@ -1,4 +1,4 @@
-import { User } from "interfaces/auth";
+import { MeResponse, User } from "interfaces/auth";
 
 interface AccessTokenPayload {
 	sub?: string;
@@ -18,6 +18,14 @@ export function parseAccessTokenPayload(token: string): AccessTokenPayload {
 	} catch {
 		return {};
 	}
+}
+
+export function userFromMe(me: MeResponse): User {
+	return {
+		id: me.id,
+		name: me.name,
+		email: me.email,
+	};
 }
 
 export function userFromAccessToken(token: string, fallbackEmail?: string): User {
