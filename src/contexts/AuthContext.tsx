@@ -10,7 +10,6 @@ import {
 import { useQueryClient } from "react-query";
 import { SignInPayload, User } from "interfaces/auth";
 import { authServices } from "services/auth";
-import { setUnauthorizedHandler } from "services/handlers";
 import { userFromAccessToken, userFromMe } from "utils/jwt";
 import {
   accessTokenStorage,
@@ -76,11 +75,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setUser(null);
     setToken(null);
   }, [queryClient]);
-
-  useEffect(() => {
-    setUnauthorizedHandler(signOut);
-    return () => setUnauthorizedHandler(undefined);
-  }, [signOut]);
 
   useEffect(() => {
     if (!token) {

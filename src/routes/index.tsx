@@ -3,6 +3,8 @@ import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import Login from "pages/Login";
 import UnProtectedMiddleware from "middlewares/UnProtectedRoutes";
 import ProtectedMiddleware from "middlewares/ProtectedRoutes";
+import UnauthorizedHandler from "middlewares/UnauthorizedHandler";
+import { useAuth } from "contexts/AuthContext";
 import ConfirmCode from "pages/ConfirmCode";
 import RequestNewPassword from "pages/RequestNewPassword";
 import ResetPassword from "pages/ResetPassword";
@@ -18,9 +20,21 @@ import MessageTemplates from "pages/MessageTemplates";
 import DailyMessages from "pages/DailyMessages";
 import MonthlyBirthdays from "pages/MonthlyBirthdays";
 
+function CatchAllRedirect() {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <Navigate
+      to={isAuthenticated ? siteMap.protected.home : siteMap.auth.login}
+      replace
+    />
+  );
+}
+
 export default function Router() {
   return (
     <BrowserRouter>
+      <UnauthorizedHandler />
       <Routes>
         <Route element={<UnProtectedMiddleware />}>
           <Route path={siteMap.auth.login} element={<Login />} />
@@ -69,10 +83,7 @@ export default function Router() {
             element={<MonthlyBirthdays />}
           />
         </Route>
-        <Route
-          path="*"
-          element={<Navigate to={siteMap.protected.home} replace />}
-        />
+        <Route path="*" element={<CatchAllRedirect />} />
       </Routes>
     </BrowserRouter>
   );
