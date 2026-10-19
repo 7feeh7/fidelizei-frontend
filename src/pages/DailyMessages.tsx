@@ -57,7 +57,7 @@ function DailyMessages() {
     { keepPreviousData: true }
   );
 
-  const messages = data?.data ?? [];
+  const messages = useMemo(() => data?.data ?? [], [data?.data]);
 
   const groupedMessages = useMemo(() => {
     const groups = new Map<MessageTemplateType, MessageListItem[]>();
