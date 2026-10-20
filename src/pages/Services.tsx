@@ -90,14 +90,19 @@ function Services() {
 
   return (
     <Stack spacing={3}>
-      <Typography variant="h5" fontWeight={700}>
-        Serviços
-      </Typography>
-
-      <Stack direction="row" justifyContent="flex-end">
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        alignItems={{ xs: "stretch", sm: "center" }}
+        justifyContent="space-between"
+      >
+        <Typography variant="h5" fontWeight={700}>
+          Serviços
+        </Typography>
         <RoundedButton
           startIcon={<AddIcon />}
           onClick={() => setCreateOpen(true)}
+          sx={{ alignSelf: { xs: "stretch", sm: "auto" } }}
         >
           Novo serviço
         </RoundedButton>
@@ -125,7 +130,7 @@ function Services() {
               <TableRow>
                 <TableCell>Nome</TableCell>
                 <TableCell>Preço</TableCell>
-                <TableCell>Dias sugeridos para retorno</TableCell>
+                <TableCell>Sugestão de retorno</TableCell>
                 <TableCell align="right">Ações</TableCell>
               </TableRow>
             </TableHead>

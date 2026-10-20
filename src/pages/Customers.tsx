@@ -197,33 +197,34 @@ function Customers() {
 
   return (
     <Stack spacing={3}>
-      <Typography variant="h5" fontWeight={700}>
-        Clientes
-      </Typography>
-
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
         alignItems={{ xs: "stretch", sm: "center" }}
+        justifyContent="space-between"
       >
-        <DebouncedSearchField
-          allowBlankAction
-          loading={isFetching && !isFetchingNextPage}
-          onSearch={setSearch}
-          onClear={() => setSearch("")}
-          textFieldProps={{
-            placeholder: "Buscar por nome ou telefone",
-            fullWidth: true,
-          }}
-        />
+        <Typography variant="h5" fontWeight={700}>
+          Clientes
+        </Typography>
         <RoundedButton
           startIcon={<AddIcon />}
           onClick={() => setCreateOpen(true)}
-          sx={{ flexShrink: 0, alignSelf: { xs: "stretch", sm: "auto" } }}
+          sx={{ alignSelf: { xs: "stretch", sm: "auto" } }}
         >
           Novo cliente
         </RoundedButton>
       </Stack>
+
+      <DebouncedSearchField
+        allowBlankAction
+        loading={isFetching && !isFetchingNextPage}
+        onSearch={setSearch}
+        onClear={() => setSearch("")}
+        textFieldProps={{
+          placeholder: "Buscar por nome ou telefone",
+          fullWidth: true,
+        }}
+      />
 
       <Paper>
         <TableContainer

@@ -137,12 +137,20 @@ function LoyaltyRules() {
 
   return (
     <Stack spacing={3}>
-      <Typography variant="h5" fontWeight={700}>
-        Regras de fidelidade
-      </Typography>
-
-      <Stack direction="row" justifyContent="flex-end">
-        <RoundedButton startIcon={<AddIcon />} onClick={openCreateDialog}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        alignItems={{ xs: "stretch", sm: "center" }}
+        justifyContent="space-between"
+      >
+        <Typography variant="h5" fontWeight={700}>
+          Regras de fidelidade
+        </Typography>
+        <RoundedButton
+          startIcon={<AddIcon />}
+          onClick={openCreateDialog}
+          sx={{ alignSelf: { xs: "stretch", sm: "auto" } }}
+        >
           Nova regra
         </RoundedButton>
       </Stack>

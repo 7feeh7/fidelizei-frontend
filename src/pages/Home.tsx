@@ -4,8 +4,8 @@ import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import {
   Alert,
+  Box,
   CircularProgress,
-  Grid,
   Stack,
   TextField,
   Typography,
@@ -108,36 +108,38 @@ function Home() {
         ) : null}
 
         {isRangeValid && !isLoading ? (
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} lg={3}>
-              <IndicatorCard
-                icon={<EventAvailableOutlinedIcon />}
-                value={String(data?.appointmentsCount ?? 0)}
-                description="atendimentos"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} lg={3}>
-              <IndicatorCard
-                icon={<AttachMoneyOutlinedIcon />}
-                value={formatCurrency(data?.billedAmount ?? 0)}
-                description="faturado"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} lg={3}>
-              <IndicatorCard
-                icon={<PersonAddOutlinedIcon />}
-                value={String(data?.newCustomersCount ?? 0)}
-                description="clientes novos"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} lg={3}>
-              <IndicatorCard
-                icon={<ShareOutlinedIcon />}
-                value={String(data?.convertedReferralsCount ?? 0)}
-                description="indicações que viraram clientes"
-              />
-            </Grid>
-          </Grid>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                lg: "repeat(4, 1fr)",
+              },
+              gap: 2,
+            }}
+          >
+            <IndicatorCard
+              icon={<EventAvailableOutlinedIcon />}
+              value={String(data?.appointmentsCount ?? 0)}
+              description="atendimentos"
+            />
+            <IndicatorCard
+              icon={<AttachMoneyOutlinedIcon />}
+              value={formatCurrency(data?.billedAmount ?? 0)}
+              description="faturado"
+            />
+            <IndicatorCard
+              icon={<PersonAddOutlinedIcon />}
+              value={String(data?.newCustomersCount ?? 0)}
+              description="clientes novos"
+            />
+            <IndicatorCard
+              icon={<ShareOutlinedIcon />}
+              value={String(data?.convertedReferralsCount ?? 0)}
+              description="indicações que viraram clientes"
+            />
+          </Box>
         ) : null}
       </Stack>
     </Stack>

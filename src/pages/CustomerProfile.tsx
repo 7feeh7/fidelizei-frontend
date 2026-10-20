@@ -210,6 +210,7 @@ function CustomerProfile() {
           <Stack
             direction={{ xs: "column", md: "row" }}
             justifyContent="space-between"
+            alignItems={{ xs: "stretch", md: "flex-start" }}
             spacing={2}
           >
             <Box>
@@ -228,7 +229,15 @@ function CustomerProfile() {
               </Typography>
             </Box>
 
-            <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1}>
+            <Stack
+              direction="row"
+              flexWrap="wrap"
+              useFlexGap
+              spacing={1}
+              alignItems="center"
+              alignContent="flex-start"
+              sx={{ alignSelf: { xs: "stretch", md: "flex-start" } }}
+            >
               <RoundedButton
                 size="small"
                 startIcon={<EventAvailableIcon />}

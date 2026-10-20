@@ -195,7 +195,13 @@ function Appointments() {
                       }}
                     >
                       <VisibilityOutlinedIcon fontSize="small" />
-                      Ver detalhes
+                      <Typography
+                        component="span"
+                        variant="inherit"
+                        sx={{ display: { xs: "none", sm: "inline" } }}
+                      >
+                        Ver detalhes
+                      </Typography>
                     </MuiLink>
                   </TableCell>
                 </TableRow>
