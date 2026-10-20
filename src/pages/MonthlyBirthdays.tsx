@@ -17,24 +17,8 @@ import {
   TableRow,
 } from "components/Tables";
 import { customerServices } from "services/customers";
-import {
-  formatDateOfBirthDisplay,
-} from "utils/birthday";
-
-const MONTH_OPTIONS = [
-  { value: 1, label: "Janeiro" },
-  { value: 2, label: "Fevereiro" },
-  { value: 3, label: "Março" },
-  { value: 4, label: "Abril" },
-  { value: 5, label: "Maio" },
-  { value: 6, label: "Junho" },
-  { value: 7, label: "Julho" },
-  { value: 8, label: "Agosto" },
-  { value: 9, label: "Setembro" },
-  { value: 10, label: "Outubro" },
-  { value: 11, label: "Novembro" },
-  { value: 12, label: "Dezembro" },
-];
+import { formatDateOfBirthDisplay } from "utils/birthday";
+import { MONTH_OPTIONS } from "utils/monthOptions";
 
 function MonthlyBirthdays() {
   const now = useMemo(() => new Date(), []);

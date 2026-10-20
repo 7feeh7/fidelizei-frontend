@@ -1,21 +1,45 @@
+import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
+import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
+import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
+import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import {
-  Card,
-  CardActionArea,
-  CardContent,
+  Alert,
+  CircularProgress,
   Grid,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useQuery } from "react-query";
 import appConfig from "app.config";
+import IndicatorCard from "components/Indicators/IndicatorCard";
 import { useAuth } from "contexts/AuthContext";
-import menuItems from "routes/menu";
-import siteMap from "routes/siteMap";
+import { indicatorsServices } from "services/indicators";
+import { formatCurrency } from "utils/currency";
+import {
+  getCurrentMonthDateRange,
+  getEarliestIndicatorsDate,
+  getTodayDateOnly,
+  isIndicatorsRangeValid,
+} from "utils/indicatorsDateRange";
 
 function Home() {
   const { user } = useAuth();
-  const modules = menuItems.filter(
-    (item) => item.path !== siteMap.protected.home
+  const now = useMemo(() => new Date(), []);
+  const defaultRange = useMemo(() => getCurrentMonthDateRange(now), [now]);
+  const minDate = useMemo(() => getEarliestIndicatorsDate(now), [now]);
+  const maxDate = useMemo(() => getTodayDateOnly(now), [now]);
+
+  const [startDate, setStartDate] = useState(defaultRange.startDate);
+  const [endDate, setEndDate] = useState(defaultRange.endDate);
+
+  const isRangeValid = isIndicatorsRangeValid(startDate, endDate, now);
+
+  const { data, isLoading, isError } = useQuery(
+    ["indicators", startDate, endDate],
+    () => indicatorsServices.get({ startDate, endDate }),
+    { enabled: isRangeValid }
   );
 
   return (
@@ -29,22 +53,93 @@ function Home() {
         </Typography>
       </div>
 
-      <Grid container spacing={2}>
-        {modules.map((item) => (
-          <Grid item xs={12} sm={6} md={4} key={item.path}>
-            <Card>
-              <CardActionArea component={RouterLink} to={item.path}>
-                <CardContent>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Stack sx={{ color: "primary.main" }}>{item.icon}</Stack>
-                    <Typography fontWeight={700}>{item.label}</Typography>
-                  </Stack>
-                </CardContent>
-              </CardActionArea>
-            </Card>
+      <Stack spacing={2}>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "stretch", md: "center" }}
+          spacing={2}
+        >
+          <Typography variant="h6" fontWeight={700}>
+            Resumo
+          </Typography>
+
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+            <TextField
+              label="De"
+              type="date"
+              size="small"
+              value={startDate}
+              onChange={(event) => setStartDate(event.target.value)}
+              InputLabelProps={{ shrink: true }}
+              inputProps={{ min: minDate, max: maxDate }}
+              fullWidth
+            />
+            <TextField
+              label="Até"
+              type="date"
+              size="small"
+              value={endDate}
+              onChange={(event) => setEndDate(event.target.value)}
+              InputLabelProps={{ shrink: true }}
+              inputProps={{ min: minDate, max: maxDate }}
+              fullWidth
+            />
+          </Stack>
+        </Stack>
+
+        {!isRangeValid ? (
+          <Alert severity="warning">
+            Selecione um período válido de até 12 meses dentro dos últimos 12
+            meses.
+          </Alert>
+        ) : null}
+
+        {isError ? (
+          <Alert severity="error">
+            Não foi possível carregar os indicadores.
+          </Alert>
+        ) : null}
+
+        {isRangeValid && isLoading ? (
+          <Stack alignItems="center" py={6}>
+            <CircularProgress />
+          </Stack>
+        ) : null}
+
+        {isRangeValid && !isLoading ? (
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} lg={3}>
+              <IndicatorCard
+                icon={<EventAvailableOutlinedIcon />}
+                value={String(data?.appointmentsCount ?? 0)}
+                description="atendimentos"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} lg={3}>
+              <IndicatorCard
+                icon={<AttachMoneyOutlinedIcon />}
+                value={formatCurrency(data?.billedAmount ?? 0)}
+                description="faturado"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} lg={3}>
+              <IndicatorCard
+                icon={<PersonAddOutlinedIcon />}
+                value={String(data?.newCustomersCount ?? 0)}
+                description="clientes novos"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} lg={3}>
+              <IndicatorCard
+                icon={<ShareOutlinedIcon />}
+                value={String(data?.convertedReferralsCount ?? 0)}
+                description="indicações que viraram clientes"
+              />
+            </Grid>
           </Grid>
-        ))}
-      </Grid>
+        ) : null}
+      </Stack>
     </Stack>
   );
 }
