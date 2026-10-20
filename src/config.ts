@@ -12,4 +12,5 @@ export const STORAGE_KEYS = {
   ACCESS_TOKEN: `@${projectName}:access_token`,
   REFRESH_TOKEN: `@${projectName}:refresh_token`,
   USER: `@${projectName}:user`,
+  REMEMBERED_LOGIN: `@${projectName}:remembered_login`,
 };

@@ -21,6 +21,11 @@ export const mockAuthServices: AuthServices = {
     await delay();
     return mockCurrentUser;
   },
+  async updateProfile(_id, payload) {
+    await delay();
+    mockCurrentUser.name = payload.name;
+    mockCurrentUser.email = payload.email;
+  },
   async requestNewPassword() {
     await delay();
   },

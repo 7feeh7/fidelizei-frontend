@@ -10,13 +10,26 @@ import {
   useTheme,
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "contexts/AuthContext";
+import siteMap from "routes/siteMap";
 import colors from "theme/colors";
 
 function UserProfile() {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  function closeMenu() {
+    setAnchorEl(null);
+  }
+
+  function goToProfile() {
+    closeMenu();
+    navigate(siteMap.protected.profile);
+  }
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -52,11 +65,22 @@ function UserProfile() {
       <Menu
         anchorEl={anchorEl}
         open={!!anchorEl}
-        onClose={() => setAnchorEl(null)}
+        onClose={closeMenu}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <MenuItem onClick={signOut}>
+        <MenuItem onClick={goToProfile}>
+          <ListItemIcon>
+            <PersonOutlineIcon fontSize="small" />
+          </ListItemIcon>
+          Perfil
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            closeMenu();
+            signOut();
+          }}
+        >
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>

@@ -8,6 +8,8 @@ const apiAuthServices: AuthServices = {
   signIn: (payload) =>
     api.post<SignInResponse>("login", payload).then((res) => res.data),
   getMe: () => api.get<MeResponse>("me").then((res) => res.data),
+  updateProfile: (id, payload) =>
+    api.patch(`users/${id}`, payload).then(() => undefined),
   requestNewPassword: (email) =>
     api.post("password/request", { email }).then(() => undefined),
   resetPassword: (payload) =>

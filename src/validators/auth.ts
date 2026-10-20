@@ -42,3 +42,34 @@ export const newPasswordValidator = Yup.object({
     .oneOf([Yup.ref("new_password")], "As senhas não conferem")
     .required("Confirme a nova senha"),
 });
+
+export const profileValidator = Yup.object({
+  name: Yup.string().trim().required("Nome obrigatório"),
+  email,
+  password: Yup.string().test(
+    "optional-password",
+    "",
+    function validateOptionalPassword(value) {
+      if (!value) {
+        return true;
+      }
+
+      try {
+        new_password.validateSync(value);
+        return true;
+      } catch (error) {
+        return this.createError({
+          message: (error as Yup.ValidationError).message,
+        });
+      }
+    }
+  ),
+  password_confirmation: Yup.string().when("password", {
+    is: (value: string) => Boolean(value?.length),
+    then: (schema) =>
+      schema
+        .oneOf([Yup.ref("password")], "As senhas não conferem")
+        .required("Confirme a nova senha"),
+    otherwise: (schema) => schema.optional(),
+  }),
+});

@@ -21,6 +21,7 @@ interface ContextProps {
   user: User | null;
   isAuthenticated: boolean;
   signIn(payload: SignInPayload): Promise<User>;
+  refreshUser(): Promise<User>;
   signOut(): void;
 }
 
@@ -85,8 +86,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, [token, syncAuthenticatedUser]);
 
   const value = useMemo(
-    () => ({ user, isAuthenticated: !!token, signIn, signOut }),
-    [user, token, signIn, signOut]
+    () => ({
+      user,
+      isAuthenticated: !!token,
+      signIn,
+      refreshUser: syncAuthenticatedUser,
+      signOut,
+    }),
+    [user, token, signIn, syncAuthenticatedUser, signOut]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

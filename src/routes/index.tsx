@@ -19,6 +19,7 @@ import LoyaltyRules from "pages/LoyaltyRules";
 import MessageTemplates from "pages/MessageTemplates";
 import DailyMessages from "pages/DailyMessages";
 import MonthlyBirthdays from "pages/MonthlyBirthdays";
+import Profile from "pages/Profile";
 
 function CatchAllRedirect() {
   const { isAuthenticated } = useAuth();
@@ -82,6 +83,7 @@ export default function Router() {
             path={siteMap.protected.monthlyBirthdays}
             element={<MonthlyBirthdays />}
           />
+          <Route path={siteMap.protected.profile} element={<Profile />} />
         </Route>
         <Route path="*" element={<CatchAllRedirect />} />
       </Routes>

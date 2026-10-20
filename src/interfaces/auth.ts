@@ -29,9 +29,16 @@ export interface ResetPasswordPayload {
   new_password: string;
 }
 
+export interface UpdateProfilePayload {
+  name: string;
+  email: string;
+  password?: string;
+}
+
 export interface AuthServices {
   signIn(payload: SignInPayload): Promise<SignInResponse>;
   getMe(): Promise<MeResponse>;
+  updateProfile(id: string, payload: UpdateProfilePayload): Promise<void>;
   requestNewPassword(email: string): Promise<void>;
   resetPassword(payload: ResetPasswordPayload): Promise<void>;
 }

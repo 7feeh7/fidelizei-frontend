@@ -18,5 +18,6 @@ export default {
     messageTemplates: "/modelos-de-mensagem",
     dailyMessages: "/mensagens-do-dia",
     monthlyBirthdays: "/aniversariantes",
+    profile: "/perfil",
   },
 };
