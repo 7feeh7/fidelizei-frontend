@@ -13,6 +13,7 @@ import {
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import appConfig from "app.config";
+import CallTodaySection from "components/Home/CallTodaySection";
 import IndicatorCard from "components/Indicators/IndicatorCard";
 import { useAuth } from "contexts/AuthContext";
 import { indicatorsServices } from "services/indicators";
@@ -61,7 +62,7 @@ function Home() {
           spacing={2}
         >
           <Typography variant="h6" fontWeight={700}>
-            Resumo
+            Resumo do período
           </Typography>
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
@@ -142,6 +143,8 @@ function Home() {
           </Box>
         ) : null}
       </Stack>
+
+      <CallTodaySection />
     </Stack>
   );
 }
