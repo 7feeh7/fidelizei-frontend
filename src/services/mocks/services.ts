@@ -41,7 +41,6 @@ export const mockServiceServices: ServiceServices = {
     }
 
     services = [
-      ...services,
       {
         id: crypto.randomUUID(),
         name: payload.name,
@@ -49,6 +48,7 @@ export const mockServiceServices: ServiceServices = {
         suggestedReturnDays: payload.suggestedReturnDays ?? null,
         active: true,
       },
+      ...services,
     ];
   },
 
