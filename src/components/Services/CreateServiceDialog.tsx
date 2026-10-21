@@ -1,12 +1,15 @@
-import { useState } from "react";
-import { Box, DialogContent, Stack } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Alert, Box, DialogContent, Stack } from "@mui/material";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Resolver, useForm } from "react-hook-form";
 import ActionButton from "components/ActionButton";
 import SimpleDialog from "components/Dialogs/SimpleDialog";
 import FastDialogTitle from "components/Dialogs/FastDialogTitle";
 import TextField from "components/Forms/TextField";
-import { CreateServicePayload } from "interfaces/services";
+import {
+  CreateServicePayload,
+  ServiceListItem,
+} from "interfaces/services";
 import { createServiceValidator } from "validators/services";
 
 type CreateServiceFormValues = {
@@ -19,6 +22,7 @@ type CreateServiceFormValues = {
 
 interface CreateServiceDialogProps {
   open: boolean;
+  service?: ServiceListItem | null;
   onClose: () => void;
   onSubmit: (payload: CreateServicePayload) => Promise<void>;
 }
@@ -31,25 +35,47 @@ function parseOptionalNumber(value: number | "" | null | undefined) {
   return value;
 }
 
-function CreateServiceDialog({
-  open,
-  onClose,
-  onSubmit,
-}: CreateServiceDialogProps) {
-  const [isSaving, setIsSaving] = useState(false);
-  const { control, handleSubmit, reset } = useForm<CreateServiceFormValues>({
-    resolver: yupResolver(
-      createServiceValidator
-    ) as Resolver<CreateServiceFormValues>,
-    mode: "onBlur",
-    defaultValues: {
+function toFormValues(service?: ServiceListItem | null): CreateServiceFormValues {
+  if (!service) {
+    return {
       name: "",
       description: "",
       price: "",
       durationMinutes: "",
       suggestedReturnDays: "",
-    },
+    };
+  }
+
+  return {
+    name: service.name,
+    description: service.description ?? "",
+    price: service.price,
+    durationMinutes: service.durationMinutes ?? "",
+    suggestedReturnDays: service.suggestedReturnDays ?? "",
+  };
+}
+
+function CreateServiceDialog({
+  open,
+  service,
+  onClose,
+  onSubmit,
+}: CreateServiceDialogProps) {
+  const [isSaving, setIsSaving] = useState(false);
+  const isEditing = Boolean(service);
+  const { control, handleSubmit, reset } = useForm<CreateServiceFormValues>({
+    resolver: yupResolver(
+      createServiceValidator
+    ) as Resolver<CreateServiceFormValues>,
+    mode: "onBlur",
+    defaultValues: toFormValues(service),
   });
+
+  useEffect(() => {
+    if (open) {
+      reset(toFormValues(service));
+    }
+  }, [open, service, reset]);
 
   function handleClose() {
     reset();
@@ -83,10 +109,18 @@ function CreateServiceDialog({
         }
       }}
     >
-      <FastDialogTitle label="Novo serviço" closeButton={handleClose} />
+      <FastDialogTitle
+        label={isEditing ? "Editar serviço" : "Novo serviço"}
+        closeButton={handleClose}
+      />
       <form onSubmit={handleSubmit(submit)}>
         <DialogContent>
           <Stack spacing={2.5}>
+            {isEditing ? (
+              <Alert severity="info">
+                Alterar o nome atualiza também o histórico de atendimentos.
+              </Alert>
+            ) : null}
             <TextField control={control} name="name" label="Nome" autoFocus />
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
               <TextField

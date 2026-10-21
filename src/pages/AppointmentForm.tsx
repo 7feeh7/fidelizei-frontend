@@ -114,17 +114,30 @@ function AppointmentForm() {
     [customersData]
   );
 
-  const serviceOptions = useMemo(
-    () =>
-      (servicesData?.data ?? [])
-        .filter((service) => service.active)
-        .map((service) => ({
-          label: service.name,
-          value: service.id,
-          price: service.price,
-        })),
-    [servicesData]
-  );
+  const serviceOptions = useMemo(() => {
+    const activeOptions = (servicesData?.data ?? [])
+      .filter((service) => service.active)
+      .map((service) => ({
+        label: service.name,
+        value: service.id,
+        price: service.price,
+      }));
+
+    if (!isEditing || !appointmentDetail) {
+      return activeOptions;
+    }
+
+    const knownIds = new Set(activeOptions.map((option) => option.value));
+    const existingInactiveOptions = appointmentDetail.items
+      .filter((item) => !knownIds.has(item.serviceId))
+      .map((item) => ({
+        label: item.serviceName,
+        value: item.serviceId,
+        price: item.price,
+      }));
+
+    return [...activeOptions, ...existingInactiveOptions];
+  }, [servicesData, isEditing, appointmentDetail]);
 
   const userOptions: SelectOption[] = useMemo(
     () =>

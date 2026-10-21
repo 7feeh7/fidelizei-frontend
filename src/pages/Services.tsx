@@ -36,7 +36,10 @@ function formatSuggestedReturnDays(value: number | null) {
 }
 
 function Services() {
-  const [createOpen, setCreateOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingService, setEditingService] = useState<ServiceListItem | null>(
+    null
+  );
   const queryClient = useQueryClient();
   const { snackSuccess, snackError } = useSnackbarContext();
 
@@ -46,31 +49,58 @@ function Services() {
 
   const services = data?.data ?? [];
 
-  async function refreshServices() {
-    await queryClient.invalidateQueries(["services"]);
+  async function refreshRelatedQueries() {
+    await Promise.all([
+      queryClient.invalidateQueries(["services"]),
+      queryClient.invalidateQueries(["loyalty-rules"]),
+      queryClient.invalidateQueries(["appointments"]),
+    ]);
   }
 
   const createMutation = useMutation(serviceServices.create, {
     onSuccess: async () => {
-      await refreshServices();
+      await refreshRelatedQueries();
       snackSuccess("Serviço cadastrado.");
-      setCreateOpen(false);
+      setFormOpen(false);
     },
   });
 
+  const updateMutation = useMutation(
+    ({ id, payload }: { id: string; payload: CreateServicePayload }) =>
+      serviceServices.update(id, payload),
+    {
+      onSuccess: async () => {
+        await refreshRelatedQueries();
+        snackSuccess("Serviço atualizado.");
+        setEditingService(null);
+        setFormOpen(false);
+      },
+    }
+  );
+
   const deactivateMutation = useMutation(serviceServices.deactivate, {
     onSuccess: async () => {
-      await refreshServices();
+      await refreshRelatedQueries();
       snackSuccess("Serviço excluído.");
     },
   });
 
-  async function handleCreate(payload: CreateServicePayload) {
+  async function handleSubmit(payload: CreateServicePayload) {
     try {
+      if (editingService) {
+        await updateMutation.mutateAsync({ id: editingService.id, payload });
+        return;
+      }
+
       await createMutation.mutateAsync(payload);
     } catch (error) {
       snackError(
-        getApiErrorMessage(error, "Não foi possível cadastrar o serviço."),
+        getApiErrorMessage(
+          error,
+          editingService
+            ? "Não foi possível atualizar o serviço."
+            : "Não foi possível cadastrar o serviço."
+        ),
         error
       );
       throw error;
@@ -88,6 +118,21 @@ function Services() {
     }
   }
 
+  function openCreateDialog() {
+    setEditingService(null);
+    setFormOpen(true);
+  }
+
+  function openEditDialog(service: ServiceListItem) {
+    setEditingService(service);
+    setFormOpen(true);
+  }
+
+  function closeFormDialog() {
+    setFormOpen(false);
+    setEditingService(null);
+  }
+
   return (
     <Stack spacing={3}>
       <Stack
@@ -101,7 +146,7 @@ function Services() {
         </Typography>
         <RoundedButton
           startIcon={<AddIcon />}
-          onClick={() => setCreateOpen(true)}
+          onClick={openCreateDialog}
           sx={{ alignSelf: { xs: "stretch", sm: "auto" } }}
         >
           Novo serviço
@@ -149,6 +194,7 @@ function Services() {
                   <TableCell align="right">
                     <ServiceRowActions
                       service={service}
+                      onEdit={openEditDialog}
                       onDelete={handleDelete}
                     />
                   </TableCell>
@@ -160,9 +206,10 @@ function Services() {
       </Paper>
 
       <CreateServiceDialog
-        open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        onSubmit={handleCreate}
+        open={formOpen}
+        service={editingService}
+        onClose={closeFormDialog}
+        onSubmit={handleSubmit}
       />
     </Stack>
   );
