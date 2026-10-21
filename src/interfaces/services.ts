@@ -20,11 +20,12 @@ export interface CreateServicePayload {
   suggestedReturnDays?: number | null;
 }
 
-export type UpdateServicePayload = CreateServicePayload;
+export interface UpdateServicePayload extends CreateServicePayload {
+  active: boolean;
+}
 
 export interface ServiceServices {
   list(): Promise<ListServicesResponse>;
   create(payload: CreateServicePayload): Promise<void>;
   update(id: string, payload: UpdateServicePayload): Promise<void>;
-  deactivate(id: string): Promise<void>;
 }

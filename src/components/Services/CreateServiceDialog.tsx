@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
-import { Alert, Box, DialogContent, Stack } from "@mui/material";
+import {
+  Alert,
+  Box,
+  DialogContent,
+  FormControlLabel,
+  Stack,
+  Switch,
+} from "@mui/material";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Resolver, useForm } from "react-hook-form";
+import { Controller, Resolver, useForm } from "react-hook-form";
 import ActionButton from "components/ActionButton";
 import SimpleDialog from "components/Dialogs/SimpleDialog";
 import FastDialogTitle from "components/Dialogs/FastDialogTitle";
@@ -9,6 +16,7 @@ import TextField from "components/Forms/TextField";
 import {
   CreateServicePayload,
   ServiceListItem,
+  UpdateServicePayload,
 } from "interfaces/services";
 import { createServiceValidator } from "validators/services";
 
@@ -18,13 +26,16 @@ type CreateServiceFormValues = {
   price: number | "";
   durationMinutes?: number | "" | null;
   suggestedReturnDays?: number | "" | null;
+  active: boolean;
 };
 
 interface CreateServiceDialogProps {
   open: boolean;
   service?: ServiceListItem | null;
   onClose: () => void;
-  onSubmit: (payload: CreateServicePayload) => Promise<void>;
+  onSubmit: (
+    payload: CreateServicePayload | UpdateServicePayload
+  ) => Promise<void>;
 }
 
 function parseOptionalNumber(value: number | "" | null | undefined) {
@@ -43,6 +54,7 @@ function toFormValues(service?: ServiceListItem | null): CreateServiceFormValues
       price: "",
       durationMinutes: "",
       suggestedReturnDays: "",
+      active: true,
     };
   }
 
@@ -52,6 +64,7 @@ function toFormValues(service?: ServiceListItem | null): CreateServiceFormValues
     price: service.price,
     durationMinutes: service.durationMinutes ?? "",
     suggestedReturnDays: service.suggestedReturnDays ?? "",
+    active: service.active,
   };
 }
 
@@ -85,13 +98,23 @@ function CreateServiceDialog({
   async function submit(data: CreateServiceFormValues) {
     setIsSaving(true);
     try {
-      await onSubmit({
+      const basePayload = {
         name: data.name,
         description: data.description?.trim() ? data.description.trim() : null,
         price: Number(data.price),
         durationMinutes: parseOptionalNumber(data.durationMinutes),
         suggestedReturnDays: parseOptionalNumber(data.suggestedReturnDays),
-      });
+      };
+
+      if (isEditing) {
+        await onSubmit({
+          ...basePayload,
+          active: data.active,
+        });
+      } else {
+        await onSubmit(basePayload);
+      }
+
       reset();
     } finally {
       setIsSaving(false);
@@ -156,6 +179,23 @@ function CreateServiceDialog({
                 sx={{ flex: 1 }}
               />
             </Stack>
+            {isEditing ? (
+              <Controller
+                control={control}
+                name="active"
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={field.value}
+                        onChange={(_, checked) => field.onChange(checked)}
+                      />
+                    }
+                    label="Serviço ativo"
+                  />
+                )}
+              />
+            ) : null}
           </Stack>
         </DialogContent>
         <Box sx={{ px: 3, pb: 3 }}>

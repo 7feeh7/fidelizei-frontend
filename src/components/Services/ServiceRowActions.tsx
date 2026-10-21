@@ -6,7 +6,6 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { ServiceListItem } from "interfaces/services";
@@ -14,10 +13,9 @@ import { ServiceListItem } from "interfaces/services";
 interface ServiceRowActionsProps {
   service: ServiceListItem;
   onEdit: (service: ServiceListItem) => void;
-  onDelete: (service: ServiceListItem) => void;
 }
 
-function ServiceRowActions({ service, onEdit, onDelete }: ServiceRowActionsProps) {
+function ServiceRowActions({ service, onEdit }: ServiceRowActionsProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -46,19 +44,6 @@ function ServiceRowActions({ service, onEdit, onDelete }: ServiceRowActionsProps
           </ListItemIcon>
           <ListItemText>Editar</ListItemText>
         </MenuItem>
-        {service.active ? (
-          <MenuItem
-            onClick={() => {
-              handleClose();
-              onDelete(service);
-            }}
-          >
-            <ListItemIcon>
-              <DeleteOutlineIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Excluir</ListItemText>
-          </MenuItem>
-        ) : null}
       </Menu>
     </>
   );

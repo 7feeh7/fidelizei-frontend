@@ -85,24 +85,9 @@ export const mockServiceServices: ServiceServices = {
             price: payload.price,
             durationMinutes: payload.durationMinutes ?? null,
             suggestedReturnDays: payload.suggestedReturnDays ?? null,
+            active: payload.active,
           }
         : service
-    );
-  },
-
-  async deactivate(id: string) {
-    await delay();
-
-    const index = services.findIndex(
-      (service) => service.id === id && service.active
-    );
-
-    if (index === -1) {
-      throw new Error("Serviço não encontrado");
-    }
-
-    services = services.map((service) =>
-      service.id === id ? { ...service, active: false } : service
     );
   },
 };

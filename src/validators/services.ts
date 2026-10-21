@@ -20,4 +20,5 @@ export const createServiceValidator = Yup.object({
     .min(0, "Preço inválido"),
   durationMinutes: optionalPositiveInteger("Duração"),
   suggestedReturnDays: optionalPositiveInteger("Prazo de retorno sugerido"),
+  active: Yup.boolean().optional(),
 });

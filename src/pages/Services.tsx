@@ -18,6 +18,7 @@ import { useSnackbarContext } from "contexts/SnackbarContext";
 import {
   CreateServicePayload,
   ServiceListItem,
+  UpdateServicePayload,
 } from "interfaces/services";
 import { serviceServices } from "services/services";
 import { getApiErrorMessage } from "utils/apiError";
@@ -66,33 +67,35 @@ function Services() {
   });
 
   const updateMutation = useMutation(
-    ({ id, payload }: { id: string; payload: CreateServicePayload }) =>
+    ({ id, payload }: { id: string; payload: UpdateServicePayload }) =>
       serviceServices.update(id, payload),
     {
-      onSuccess: async () => {
+      onSuccess: async (_data, variables) => {
         await refreshRelatedQueries();
-        snackSuccess("Serviço atualizado.");
+        snackSuccess(
+          variables.payload.active
+            ? "Serviço atualizado."
+            : "Serviço inativado."
+        );
         setEditingService(null);
         setFormOpen(false);
       },
     }
   );
 
-  const deactivateMutation = useMutation(serviceServices.deactivate, {
-    onSuccess: async () => {
-      await refreshRelatedQueries();
-      snackSuccess("Serviço excluído.");
-    },
-  });
-
-  async function handleSubmit(payload: CreateServicePayload) {
+  async function handleSubmit(
+    payload: CreateServicePayload | UpdateServicePayload
+  ) {
     try {
       if (editingService) {
-        await updateMutation.mutateAsync({ id: editingService.id, payload });
+        await updateMutation.mutateAsync({
+          id: editingService.id,
+          payload: payload as UpdateServicePayload,
+        });
         return;
       }
 
-      await createMutation.mutateAsync(payload);
+      await createMutation.mutateAsync(payload as CreateServicePayload);
     } catch (error) {
       snackError(
         getApiErrorMessage(
@@ -104,17 +107,6 @@ function Services() {
         error
       );
       throw error;
-    }
-  }
-
-  async function handleDelete(service: ServiceListItem) {
-    try {
-      await deactivateMutation.mutateAsync(service.id);
-    } catch (error) {
-      snackError(
-        getApiErrorMessage(error, "Não foi possível excluir o serviço."),
-        error
-      );
     }
   }
 
@@ -195,7 +187,6 @@ function Services() {
                     <ServiceRowActions
                       service={service}
                       onEdit={openEditDialog}
-                      onDelete={handleDelete}
                     />
                   </TableCell>
                 </TableRow>
