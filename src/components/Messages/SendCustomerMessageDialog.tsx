@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  Box,
   DialogContent,
   FormControl,
   FormControlLabel,
@@ -163,13 +164,15 @@ function SendCustomerMessageDialog({
             )}
           </Stack>
         </DialogContent>
-        <ActionButton
-          rejectMsg="Cancelar"
-          resolveMsg="Adicionar à fila"
-          resolveType="submit"
-          resolveLoading={isSaving}
-          onReject={onClose}
-        />
+        <Box sx={{ px: 3, pb: 3 }}>
+          <ActionButton
+            rejectMsg="Cancelar"
+            resolveMsg="Adicionar à fila"
+            resolveType="submit"
+            resolveLoading={isSaving}
+            onReject={onClose}
+          />
+        </Box>
       </form>
     </SimpleDialog>
   );
