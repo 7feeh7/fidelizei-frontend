@@ -2,12 +2,16 @@ import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlin
 import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
 import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import {
   Alert,
   Box,
   CircularProgress,
+  IconButton,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useMemo, useState } from "react";
@@ -16,6 +20,7 @@ import appConfig from "app.config";
 import CallTodaySection from "components/Home/CallTodaySection";
 import IndicatorCard from "components/Indicators/IndicatorCard";
 import { useAuth } from "contexts/AuthContext";
+import { hideBilledAmountStorage } from "hooks/storage/hideBilledAmount";
 import { indicatorsServices } from "services/indicators";
 import { formatCurrency } from "utils/currency";
 import {
@@ -34,14 +39,33 @@ function Home() {
 
   const [startDate, setStartDate] = useState(defaultRange.startDate);
   const [endDate, setEndDate] = useState(defaultRange.endDate);
+  const [isBilledHidden, setIsBilledHidden] = useState(
+    () => hideBilledAmountStorage.get() ?? false
+  );
 
   const isRangeValid = isIndicatorsRangeValid(startDate, endDate, now);
+
+  const toggleBilledVisibility = () => {
+    setIsBilledHidden((previous) => {
+      const next = !previous;
+      hideBilledAmountStorage.set(next);
+      return next;
+    });
+  };
+
+  const billedVisibilityLabel = isBilledHidden
+    ? "Mostrar valores"
+    : "Ocultar valores";
 
   const { data, isLoading, isError } = useQuery(
     ["indicators", startDate, endDate],
     () => indicatorsServices.get({ startDate, endDate }),
     { enabled: isRangeValid }
   );
+
+  const billedDisplayValue = isBilledHidden
+    ? "R$ •••••"
+    : formatCurrency(data?.billedAmount ?? 0);
 
   return (
     <Stack spacing={4}>
@@ -61,9 +85,28 @@ function Home() {
           alignItems={{ xs: "stretch", md: "center" }}
           spacing={2}
         >
-          <Typography variant="h6" fontWeight={700}>
-            Resumo do período
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={0.5}>
+            <Typography variant="h6" fontWeight={700}>
+              Resumo do período
+            </Typography>
+            <Tooltip title={billedVisibilityLabel}>
+              <IconButton
+                onClick={toggleBilledVisibility}
+                aria-label={billedVisibilityLabel}
+                sx={{
+                  width: 44,
+                  height: 44,
+                  "& svg": { fontSize: 22 },
+                }}
+              >
+                {isBilledHidden ? (
+                  <VisibilityOutlinedIcon />
+                ) : (
+                  <VisibilityOffOutlinedIcon />
+                )}
+              </IconButton>
+            </Tooltip>
+          </Stack>
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
             <TextField
@@ -127,7 +170,7 @@ function Home() {
             />
             <IndicatorCard
               icon={<AttachMoneyOutlinedIcon />}
-              value={formatCurrency(data?.billedAmount ?? 0)}
+              value={billedDisplayValue}
               description="faturado"
             />
             <IndicatorCard
