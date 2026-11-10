@@ -29,6 +29,7 @@ import {
   MESSAGE_TEMPLATE_TYPE_OPTIONS,
 } from "utils/messageTemplatePresentation";
 import { computeAge, formatDateOfBirthDisplay } from "utils/birthday";
+import { formatPhone } from "utils/phone";
 
 export type DailyMessagesView = "pending" | "sent" | "canceled";
 
@@ -205,7 +206,7 @@ function DailyMessages({ view: tab }: DailyMessagesProps) {
                         {message.customerName}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {message.customerPhone} ·{" "}
+                        {formatPhone(message.customerPhone)} ·{" "}
                         {formatMessageTemplateType(message.type)}
                         {message.type === "RETURN_REMINDER" &&
                           message.returnReminderServiceName &&

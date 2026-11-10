@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import { onlyDigits } from "utils/phone";
 
 export const LEAD_SOURCES = [
   "INDICACAO",
@@ -21,7 +22,10 @@ export const createCustomerValidator = Yup.object({
   phone: Yup.string()
     .trim()
     .required("WhatsApp obrigatório")
-    .min(10, "WhatsApp inválido"),
+    .test("phone-digits", "WhatsApp inválido", (value) => {
+      const length = onlyDigits(value).length;
+      return length === 10 || length === 11;
+    }),
   leadSource: Yup.mixed<LeadSource>()
     .oneOf([...LEAD_SOURCES], "Selecione como conheceu o salão")
     .required("Selecione como conheceu o salão"),

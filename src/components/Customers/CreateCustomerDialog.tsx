@@ -14,6 +14,7 @@ import ActionButton from "components/ActionButton";
 import SimpleDialog from "components/Dialogs/SimpleDialog";
 import FastDialogTitle from "components/Dialogs/FastDialogTitle";
 import AutoCompleteField from "components/Forms/AutoCompleteField";
+import PhoneField from "components/Forms/PhoneField";
 import TextField from "components/Forms/TextField";
 import { CreateCustomerPayload, CustomerListItem } from "interfaces/customers";
 import { customerServices } from "services/customers";
@@ -23,6 +24,7 @@ import {
   createCustomerValidator,
 } from "validators/customers";
 import { computeAge, formatDateOfBirthDisplay } from "utils/birthday";
+import { maskPhone, onlyDigits } from "utils/phone";
 
 type CreateCustomerFormValues = {
   name: string;
@@ -118,7 +120,7 @@ function CreateCustomerDialog({
     if (customer) {
       reset({
         name: customer.name,
-        phone: customer.phone,
+        phone: maskPhone(customer.phone),
         leadSource: customer.leadSource,
         dateOfBirth: formatDateOfBirth(customer.dateOfBirth),
         referrerId: customer.referrerId,
@@ -146,7 +148,7 @@ function CreateCustomerDialog({
     try {
       const payload: CreateCustomerPayload = {
         name: data.name,
-        phone: data.phone.replace(/\D/g, ""),
+        phone: onlyDigits(data.phone),
         leadSource: data.leadSource as LeadSource,
         dateOfBirth: data.dateOfBirth || null,
       };
@@ -196,11 +198,10 @@ function CreateCustomerDialog({
                 autoFocus
                 sx={{ flex: 1 }}
               />
-              <TextField
+              <PhoneField
                 control={control}
                 name="phone"
                 label="WhatsApp"
-                placeholder="11999998888"
                 sx={{ flex: 1 }}
               />
             </Stack>

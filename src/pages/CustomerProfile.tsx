@@ -38,6 +38,7 @@ import { getApiErrorMessage } from "utils/apiError";
 import { formatDateOfBirthDisplay } from "utils/birthday";
 import { formatCurrency } from "utils/currency";
 import { LEAD_SOURCE_OPTIONS } from "validators/customers";
+import { formatPhone } from "utils/phone";
 import { buildWhatsAppLinkFromPhone } from "utils/whatsapp";
 
 function formatLeadSource(value: CustomerSummaryResponse["leadSource"]) {
@@ -217,7 +218,9 @@ function CustomerProfile() {
               <Typography variant="h6" fontWeight={700}>
                 {summary.name}
               </Typography>
-              <Typography color="text.secondary">{summary.phone}</Typography>
+              <Typography color="text.secondary">
+                {formatPhone(summary.phone)}
+              </Typography>
               <Typography variant="body2" color="text.secondary">
                 Aniversário: {formatDateOfBirthDisplay(summary.dateOfBirth)}
               </Typography>

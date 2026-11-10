@@ -31,6 +31,7 @@ import { messageServices } from "services/messages";
 import { messageTemplateServices } from "services/messageTemplates";
 import { getApiErrorMessage } from "utils/apiError";
 import { formatGrantedRewardsMessage } from "utils/grantedRewardsMessage";
+import { formatPhone } from "utils/phone";
 import { getNextPageParam } from "utils/query";
 
 function Customers() {
@@ -266,7 +267,7 @@ function Customers() {
               {customers.map((customer) => (
                 <TableRow key={customer.id} hover>
                   <TableCell>{customer.name}</TableCell>
-                  <TableCell>{customer.phone}</TableCell>
+                  <TableCell>{formatPhone(customer.phone)}</TableCell>
                   <TableCell>{customer.referrerName ?? "—"}</TableCell>
                   <TableCell align="center">
                     {customer.referralsMadeCount}

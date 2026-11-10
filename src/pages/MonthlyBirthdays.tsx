@@ -18,6 +18,7 @@ import {
 import { customerServices } from "services/customers";
 import { formatDateOfBirthDisplay } from "utils/birthday";
 import { MONTH_OPTIONS } from "utils/monthOptions";
+import { formatPhone } from "utils/phone";
 
 function MonthlyBirthdays() {
   const now = useMemo(() => new Date(), []);
@@ -88,7 +89,7 @@ function MonthlyBirthdays() {
               {birthdays.map((customer) => (
                 <TableRow key={customer.id} hover>
                   <TableCell>{customer.name}</TableCell>
-                  <TableCell>{customer.phone}</TableCell>
+                  <TableCell>{formatPhone(customer.phone)}</TableCell>
                   <TableCell>
                     {formatDateOfBirthDisplay(customer.dateOfBirth) ?? "—"}
                   </TableCell>
