@@ -192,7 +192,7 @@ function LoyaltyRuleFormDialog({
                 <AutoCompleteField
                   control={control}
                   name="triggerType"
-                  label="Gatilho"
+                  label="Quando vale"
                   options={LOYALTY_TRIGGER_OPTIONS}
                 />
               </Box>
@@ -212,7 +212,7 @@ function LoyaltyRuleFormDialog({
                 <AutoCompleteField
                   control={control}
                   name="rewardType"
-                  label="Recompensa"
+                  label="O que o cliente ganha"
                   options={LOYALTY_REWARD_OPTIONS}
                 />
               </Box>

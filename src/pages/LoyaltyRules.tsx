@@ -173,8 +173,8 @@ function LoyaltyRules() {
             <TableHead>
               <TableRow>
                 <TableCell>Nome</TableCell>
-                <TableCell>Gatilho</TableCell>
-                <TableCell>Recompensa</TableCell>
+                <TableCell>Quando vale</TableCell>
+                <TableCell>O que o cliente ganha</TableCell>
                 <TableCell>Validade</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell align="right">Ações</TableCell>

@@ -19,8 +19,8 @@ export const loyaltyRuleValidator = Yup.object({
   name: Yup.string().trim().required("Nome obrigatório").max(100, "Nome inválido"),
   description: Yup.string().trim().nullable().optional(),
   triggerType: Yup.string()
-    .oneOf([...LOYALTY_TRIGGER_TYPES], "Gatilho inválido")
-    .required("Gatilho obrigatório"),
+    .oneOf([...LOYALTY_TRIGGER_TYPES], "Selecione quando a regra vale")
+    .required("Informe quando a regra vale"),
   visitCount: Yup.number()
     .transform((value, originalValue) =>
       originalValue === "" || originalValue == null ? null : value
@@ -36,8 +36,8 @@ export const loyaltyRuleValidator = Yup.object({
       otherwise: (schema) => schema.nullable().optional(),
     }),
   rewardType: Yup.string()
-    .oneOf([...LOYALTY_REWARD_TYPES], "Recompensa inválida")
-    .required("Recompensa obrigatória"),
+    .oneOf([...LOYALTY_REWARD_TYPES], "Selecione o que o cliente ganha")
+    .required("Informe o que o cliente ganha"),
   rewardValue: Yup.number()
     .transform((value, originalValue) =>
       originalValue === "" || originalValue == null ? null : value
