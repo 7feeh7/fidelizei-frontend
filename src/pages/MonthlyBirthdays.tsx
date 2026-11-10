@@ -16,7 +16,11 @@ import {
   TableRow,
 } from "components/Tables";
 import { customerServices } from "services/customers";
-import { formatDateOfBirthDisplay } from "utils/birthday";
+import {
+  daysUntilBirthday,
+  formatDateOfBirthDisplay,
+  formatDaysUntilBirthday,
+} from "utils/birthday";
 import { MONTH_OPTIONS } from "utils/monthOptions";
 import { formatPhone } from "utils/phone";
 
@@ -82,20 +86,37 @@ function MonthlyBirthdays() {
                 <TableCell>Nome</TableCell>
                 <TableCell>Telefone</TableCell>
                 <TableCell>Aniversário</TableCell>
-                <TableCell align="right">Idade</TableCell>
+                <TableCell align="right">Quanto falta</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {birthdays.map((customer) => (
-                <TableRow key={customer.id} hover>
-                  <TableCell>{customer.name}</TableCell>
-                  <TableCell>{formatPhone(customer.phone)}</TableCell>
-                  <TableCell>
-                    {formatDateOfBirthDisplay(customer.dateOfBirth) ?? "—"}
-                  </TableCell>
-                  <TableCell align="right">{customer.age} anos</TableCell>
-                </TableRow>
-              ))}
+              {birthdays.map((customer) => {
+                const days = daysUntilBirthday(
+                  customer.dateOfBirth,
+                  year,
+                  now
+                );
+
+                return (
+                  <TableRow key={customer.id} hover>
+                    <TableCell>{customer.name}</TableCell>
+                    <TableCell>{formatPhone(customer.phone)}</TableCell>
+                    <TableCell>
+                      {formatDateOfBirthDisplay(customer.dateOfBirth) ?? "—"}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{
+                        whiteSpace: "nowrap",
+                        color: days < 0 ? "text.secondary" : undefined,
+                        fontWeight: days === 0 ? 700 : undefined,
+                      }}
+                    >
+                      {formatDaysUntilBirthday(days)}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
