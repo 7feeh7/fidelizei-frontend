@@ -1,13 +1,9 @@
 import { ReactNode } from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
-import DesignServicesIcon from "@mui/icons-material/DesignServices";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
-import ShareIcon from "@mui/icons-material/Share";
-import LoyaltyIcon from "@mui/icons-material/Loyalty";
-import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
-import MarkChatUnreadIcon from "@mui/icons-material/MarkChatUnread";
-import CakeOutlinedIcon from "@mui/icons-material/CakeOutlined";
+import ChatIcon from "@mui/icons-material/Chat";
+import StorefrontIcon from "@mui/icons-material/Storefront";
 import siteMap from "./siteMap";
 
 export interface MenuItemConfig {
@@ -17,49 +13,32 @@ export interface MenuItemConfig {
   showPendingMessagesBadge?: boolean;
 }
 
-/** Itens do menu principal (os mesmos para o menu vertical e o horizontal). */
+/**
+ * Itens do menu principal (os mesmos para o menu lateral, o horizontal e a barra inferior do mobile).
+ * Ordem por frequência de uso.
+ */
 const menuItems: MenuItemConfig[] = [
   { label: "Início", path: siteMap.protected.home, icon: <HomeIcon /> },
-  {
-    label: "Clientes",
-    path: siteMap.protected.customers,
-    icon: <PeopleIcon />,
-  },
-  {
-    label: "Serviços",
-    path: siteMap.protected.services,
-    icon: <DesignServicesIcon />,
-  },
   {
     label: "Atendimentos",
     path: siteMap.protected.appointments,
     icon: <EventAvailableIcon />,
   },
   {
-    label: "Indicações",
-    path: siteMap.protected.referrals,
-    icon: <ShareIcon />,
+    label: "Clientes",
+    path: siteMap.protected.customers,
+    icon: <PeopleIcon />,
   },
   {
-    label: "Fidelidade",
-    path: siteMap.protected.loyaltyRules,
-    icon: <LoyaltyIcon />,
-  },
-  {
-    label: "Mensagens do dia",
-    path: siteMap.protected.dailyMessages,
-    icon: <MarkChatUnreadIcon />,
+    label: "Mensagens",
+    path: siteMap.protected.messages,
+    icon: <ChatIcon />,
     showPendingMessagesBadge: true,
   },
   {
-    label: "Aniversariantes",
-    path: siteMap.protected.monthlyBirthdays,
-    icon: <CakeOutlinedIcon />,
-  },
-  {
-    label: "Modelos de mensagem",
-    path: siteMap.protected.messageTemplates,
-    icon: <ChatOutlinedIcon />,
+    label: "Meu negócio",
+    path: siteMap.protected.business,
+    icon: <StorefrontIcon />,
   },
 ];
 

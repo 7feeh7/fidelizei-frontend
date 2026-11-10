@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Paper, Stack, Typography } from "@mui/material";
+import { Paper, Stack } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import {
   useInfiniteQuery,
@@ -201,11 +201,8 @@ function Customers() {
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
         alignItems={{ xs: "stretch", sm: "center" }}
-        justifyContent="space-between"
+        justifyContent="flex-end"
       >
-        <Typography variant="h5" fontWeight={700}>
-          Clientes
-        </Typography>
         <RoundedButton
           startIcon={<AddIcon />}
           onClick={() => setCreateOpen(true)}

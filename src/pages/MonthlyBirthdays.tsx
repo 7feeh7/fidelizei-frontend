@@ -4,7 +4,6 @@ import {
   Paper,
   Stack,
   TextField,
-  Typography,
 } from "@mui/material";
 import { useQuery } from "react-query";
 import { DefaultRenderContainer } from "components/RenderList";
@@ -36,10 +35,6 @@ function MonthlyBirthdays() {
 
   return (
     <Stack spacing={3}>
-      <Typography variant="h5" fontWeight={700}>
-        Aniversariantes do mês
-      </Typography>
-
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
         <TextField
           select

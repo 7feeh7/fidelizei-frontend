@@ -11,7 +11,10 @@ export type AuthLayout = "centered" | "split";
 /** Lado do formulário quando o layout de login é "split" (a logo fica no lado oposto) */
 export type AuthFormSide = "left" | "right";
 
-/** "vertical": menu lateral | "horizontal": menu na barra superior */
+/**
+ * Menu na web: "vertical" = menu lateral | "horizontal" = menu na barra superior.
+ * No mobile o menu é sempre uma barra horizontal fixa na parte de baixo.
+ */
 export type MenuLayout = "vertical" | "horizontal";
 
 export interface AppConfig {

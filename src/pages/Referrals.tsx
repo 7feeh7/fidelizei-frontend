@@ -6,7 +6,6 @@ import {
   Stack,
   TextField,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import { format, parseISO } from "date-fns";
@@ -135,10 +134,6 @@ function Referrals() {
 
   return (
     <Stack spacing={3}>
-      <Typography variant="h5" fontWeight={700}>
-        Indicações
-      </Typography>
-
       <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
         <Autocomplete
           options={STATUS_OPTIONS}

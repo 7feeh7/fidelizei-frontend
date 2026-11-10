@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Paper, Stack, Typography } from "@mui/material";
+import { Paper, Stack } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { RoundedButton } from "components/Button/RoundedButton";
@@ -131,11 +131,8 @@ function Services() {
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
         alignItems={{ xs: "stretch", sm: "center" }}
-        justifyContent="space-between"
+        justifyContent="flex-end"
       >
-        <Typography variant="h5" fontWeight={700}>
-          Serviços
-        </Typography>
         <RoundedButton
           startIcon={<AddIcon />}
           onClick={openCreateDialog}

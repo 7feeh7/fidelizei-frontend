@@ -1,5 +1,6 @@
 import {
   Badge,
+  BottomNavigationAction,
   Button,
   ListItem,
   ListItemButton,
@@ -7,11 +8,11 @@ import {
   ListItemText,
 } from "@mui/material";
 import { NavLink, useMatch, useResolvedPath } from "react-router-dom";
-import { MenuLayout } from "app.config";
 import { MenuItemConfig } from "routes/menu";
+import type { MenuOrientation } from ".";
 
 interface MenuItemProps extends MenuItemConfig {
-  orientation: MenuLayout;
+  orientation: MenuOrientation;
   onClick?: () => void;
   badgeCount?: number;
 }
@@ -33,6 +34,33 @@ function MenuItem({
     );
   const resolved = useResolvedPath(path);
   const active = !!useMatch({ path: resolved.pathname, end: path === "/" });
+
+  if (orientation === "bottom") {
+    return (
+      <BottomNavigationAction
+        component={NavLink}
+        to={path}
+        onClick={onClick}
+        label={label}
+        icon={iconWithBadge}
+        showLabel
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          px: 0.5,
+          color: active ? "primary.main" : "text.secondary",
+          "& .MuiBottomNavigationAction-label": {
+            fontSize: "0.6875rem",
+            fontWeight: active ? 700 : undefined,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "100%",
+          },
+        }}
+      />
+    );
+  }
 
   if (orientation === "horizontal") {
     return (

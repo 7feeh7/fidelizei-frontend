@@ -4,8 +4,6 @@ import {
   Chip,
   Paper,
   Stack,
-  Tab,
-  Tabs,
   Typography,
 } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -32,10 +30,14 @@ import {
 } from "utils/messageTemplatePresentation";
 import { computeAge, formatDateOfBirthDisplay } from "utils/birthday";
 
-type ViewTab = "pending" | "sent" | "canceled";
+export type DailyMessagesView = "pending" | "sent" | "canceled";
 
-function DailyMessages() {
-  const [tab, setTab] = useState<ViewTab>("pending");
+interface DailyMessagesProps {
+  /** qual fila mostrar (definida pela aba da tela de Mensagens) */
+  view: DailyMessagesView;
+}
+
+function DailyMessages({ view: tab }: DailyMessagesProps) {
   const [editingMessage, setEditingMessage] = useState<MessageListItem | null>(
     null
   );
@@ -170,16 +172,6 @@ function DailyMessages() {
 
   return (
     <Stack spacing={3}>
-      <Typography variant="h5" fontWeight={700}>
-        Mensagens do dia
-      </Typography>
-
-      <Tabs value={tab} onChange={(_, value) => setTab(value as ViewTab)}>
-        <Tab value="pending" label="Pendentes" />
-        <Tab value="sent" label="Enviadas" />
-        <Tab value="canceled" label="Descartadas" />
-      </Tabs>
-
       {isError && (
         <DefaultRenderContainer>
           Não foi possível carregar as mensagens.
@@ -189,7 +181,7 @@ function DailyMessages() {
       {!isError && !isLoading && messages.length === 0 && (
         <DefaultRenderContainer>
           {tab === "pending"
-            ? "Nenhuma mensagem pendente para hoje."
+            ? "Nenhuma mensagem para enviar hoje."
             : "Nenhuma mensagem nesta aba."}
         </DefaultRenderContainer>
       )}
@@ -316,7 +308,7 @@ function DailyMessages() {
       <ConfirmDialog
         open={Boolean(messageToCancel)}
         confirmTitle="Descartar mensagem?"
-        confirmSubtitle="A mensagem sairá da fila de pendentes."
+        confirmSubtitle="A mensagem sairá da fila para enviar."
         rejectMsg="Voltar"
         resolveMsg="Descartar"
         resolveLoading={cancelMutation.isLoading}
